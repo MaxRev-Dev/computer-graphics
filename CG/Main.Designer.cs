@@ -1,4 +1,6 @@
-﻿namespace Playground
+﻿using System.Windows.Forms;
+
+namespace Playground
 {
     partial class Main
     {
@@ -29,24 +31,25 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
-            this.playground = new System.Windows.Forms.PictureBox();
+
+            playground = new PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.depthLabel = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.playground)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(playground)).BeginInit();
             this.SuspendLayout();
             // 
             // playground
             // 
-            this.playground.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.playground.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.playground.Location = new System.Drawing.Point(0, 0);
-            this.playground.Name = "playground";
-            this.playground.Size = new System.Drawing.Size(800, 450);
-            this.playground.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.playground.TabIndex = 2;
-            this.playground.TabStop = false;
+            playground.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                                                                        | System.Windows.Forms.AnchorStyles.Left)
+                                                                       | System.Windows.Forms.AnchorStyles.Right)));
+            playground.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            playground.Location = new System.Drawing.Point(0, 0);
+            playground.Name = "playground";
+            playground.Size = new System.Drawing.Size(800, 450);
+            playground.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            playground.TabIndex = 2;
+            playground.TabStop = false;
             // 
             // label1
             // 
@@ -73,20 +76,21 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.depthLabel);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.playground);
+            this.Controls.Add(playground);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Main";
             this.Text = "Tetrahedron Playground";
-            this.SizeChanged += new System.EventHandler(this.Main_SizeChanged); 
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Main_KeyPress); 
-            ((System.ComponentModel.ISupportInitialize)(this.playground)).EndInit();
+            this.SizeChanged += new System.EventHandler(this.Main_SizeChanged);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Main_KeyPress);
+            ((System.ComponentModel.ISupportInitialize)(playground)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.PictureBox playground;
+
+        private PictureBox playground;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label depthLabel;
     }
