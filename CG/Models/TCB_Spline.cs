@@ -10,7 +10,7 @@ namespace Playground.Models
     {
         public bool IsClosedSpline { get; set; }
 
-        public int IntermediatePoints { get; set; } = 10;
+        public int IntermediatePoints { get; set; } = 100;
 
         public List<SplinePoint> KeyPoints { get; } = new List<SplinePoint>();
 
@@ -79,7 +79,6 @@ namespace Playground.Models
         public override void Reset(IProjectorEngine projector)
         {
             int N = 10;
-            IsClosedSpline = true;
 
             // randomize on each redraw
             KeyPoints.Clear();
@@ -93,7 +92,14 @@ namespace Playground.Models
             {
                 var (c1, c2) = (_rand.Next(stepX * rit, stepX * (rit + 1)),
                     _rand.Next(stepY * rit, stepY * (rit + 3)));
-                KeyPoints.Add(new SplinePoint { Position = new Vector3(c1, c2, 0) });
+
+                KeyPoints.Add(new SplinePoint
+                {
+                    Position = new Vector3(c1, c2, 0),
+                    Bias = (float)_rand.NextDouble() * 2 + 1,
+                    Continuity = (float)_rand.NextDouble() * 2 + 1,
+                    Tension = (float)_rand.NextDouble() * 2 + 1,
+                });
             }
         }
 
@@ -108,7 +114,8 @@ namespace Playground.Models
                     while (rx.MoveNext())
                     {
                         var point = rx.Current;
-                        projector.Graphics.DrawLine(PrimaryPen, point.X, point.Y, current.X, current.Y);
+                        //projector.Graphics.DrawLine(PrimaryPen, point.X, point.Y, current.X, current.Y);
+                        projector.Graphics.DrawEllipse(PrimaryPen, point.X, point.Y, 1,1);
                         current = point;
                     }
                 }
