@@ -4,6 +4,8 @@ using System.Drawing;
 using GraphicExtensions;
 using MaxRev.Extensions.Matrix;
 using Playground.Helpers;
+using Playground.Projections;
+using Playground.Projections.Abstractions;
 
 namespace Playground.Models
 {
@@ -25,8 +27,7 @@ namespace Playground.Models
         {
             DrawEllipsoid(projector, PrimaryPen);
         }
-
-
+         
         public override void Reset()
         {
             Model3D = GenerateElipsoid();
@@ -43,6 +44,8 @@ namespace Playground.Models
             float r1 = 1, r2 = 2, r3 = 3;
             for (float lam = 0; lam <= 2 * Math.PI.F(); lam += Math.PI.F() / n)
             {
+
+                //TODO: 
                 for (float tet = 0; tet <= Math.PI.F(); tet += Math.PI.F() / n)
                 {
                     points.Add(new[]

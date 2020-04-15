@@ -4,6 +4,8 @@ using System.Windows;
 using GraphicExtensions;
 using Playground.Helpers;
 using Playground.Primitives;
+using Playground.Projections;
+using Playground.Projections.Abstractions;
 
 namespace Playground.Models
 {

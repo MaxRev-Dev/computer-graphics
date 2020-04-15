@@ -1,4 +1,6 @@
 ﻿using System.Drawing;
+using Playground.Projections;
+using Playground.Projections.Abstractions;
 
 namespace Playground.Helpers
 {

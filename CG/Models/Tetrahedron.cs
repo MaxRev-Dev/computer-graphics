@@ -3,6 +3,8 @@ using System.Linq;
 using GraphicExtensions;
 using MaxRev.Extensions.Matrix;
 using Playground.Helpers;
+using Playground.Projections;
+using Playground.Projections.Abstractions;
 
 namespace Playground.Models
 {
@@ -83,7 +85,6 @@ namespace Playground.Models
             {
                 yield return Model3D.point(_faces[faceIndex][i]);
             }
-        }
-
+        } 
     }
 }

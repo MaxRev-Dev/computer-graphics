@@ -9,6 +9,8 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Playground.Projections;
+using Playground.Projections.Abstractions;
 using Color = System.Drawing.Color;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 using Pen = System.Drawing.Pen;
@@ -22,7 +24,10 @@ namespace Playground
         // graphics
         private Graphics _graphics;
         private Bitmap _bitmap;
-         
+
+        // graphic models container
+        private readonly ExtensionContainer _extensions = new ExtensionContainer();
+
         // modes
         private bool _wordTransformOn;
         private bool _autoRotate;
@@ -34,7 +39,7 @@ namespace Playground
         // intermediate rotation angle
         private float _angle;
         private float minRotate = 0.01745329F; // Math.PI / 180
-         
+
         private Pen foregroundPen;
         private Color _background;
         private Color _foreground;
@@ -54,19 +59,27 @@ namespace Playground
         {
             InitializeComponent();
             CreatePlayground();
-            _projector = new ProjectorEngine(_graphics);
-
-            _extensions = new ExtensionContainer
+          
+            // _projector = new PlanarProjectorEngine(_graphics);
+             _projector = new DimetricProjectorEngine(_graphics);
+             
+            Load += (s, e) =>
             {
-                new KochSnowflake(foregroundPen),
-                //new NewtonBasins(),
-                new Axis(),
-                new Tetrahedron(),
-                new Elipsoid()
+                _extensions.AddRange(new IGraphicExtension[] {
+                    //new KochSnowflake(foregroundPen),
+                    //new NewtonBasins(),
+                    //new Axis(),
+                    //new Tetrahedron(),
+                    //new Elipsoid(),
+                    //new Cube(),
+                    new FernBranch()
+                });
+                InitModelAndFrameTick();
             };
 
-            InitModel();
+
             playground.MouseWheel += CG_MouseWheel;
+            playground.KeyPress += Main_KeyPress;
             playground.Paint += (s, e) => e.Graphics.DrawImage(_bitmap, 0, 0);
             _testOutputBuilder = new StringBuilder();
             _testOutputWriter = new StringWriter(_testOutputBuilder);
@@ -75,11 +88,11 @@ namespace Playground
 
         #region Reset
 
-        private void InitModel()
+        private void InitModelAndFrameTick()
         {
             _foreground = Color.Blue;
             _background = Color.DarkRed;
-            foregroundPen = new Pen(_foreground, 1);  
+            foregroundPen = new Pen(_foreground, 1);
             ResetAll();
             var timer = new Timer
             {
@@ -95,15 +108,33 @@ namespace Playground
             _projector.ResetWorld();
         }
 
+
         private void ResetModel()
         {
             _extensions.InitializeAll();
-            Transform(CG.TranslateZ(-10)); 
+
+            // Set fern's values if ext available
+            if (_extensions.Get<FernBranch>() is var fern)
+            {
+                fern_A.Minimum = 0;
+                fern_A.Maximum = 90;
+                fern_K0.Minimum = 0;
+                fern_K0.Maximum = 100;
+                fern_K1.Minimum = 0;
+                fern_K1.Maximum = 180;
+                fern_B.Minimum = 0;
+                fern_B.Maximum = 180;
+                fern_Lmin.Minimum = 10;
+                fern_Lmin.Maximum = 1000;
+                fern_Lmin.Value = (int)fern.Lmin;
+                fern_K0.Value = (int)fern.K0 * 100;
+                fern_K1.Value = (int)fern.K1 * 100;
+                fern_B.Value = (int)(fern.Beta / Math.PI * 180);
+                fern_A.Value = (int)(fern.Alfa / Math.PI * 180);
+            }
+
+            //Transform(CG.TranslateZ(-10));
         }
-
-        private readonly ExtensionContainer _extensions;
-
-
         #endregion
 
         private void Transform(float[,] trs)
@@ -135,7 +166,6 @@ namespace Playground
             if (CheckKeys() || _autoRotate)
             {
                 Draw();
-                _extensions.DrawAll(_projector);
 
             }
 
@@ -197,7 +227,7 @@ namespace Playground
             var tens = Eps(1) * 10;
             if (IsPressed(Key.G))
             {
-                _extensions.Get<KochSnowflake>().NextGen();
+                _extensions.Get<KochSnowflake>()?.NextGen();
             }
 
             if (IsPressed(Key.R))
@@ -296,31 +326,14 @@ namespace Playground
 
         #endregion
 
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            Draw();
-        }
 
         private void Draw()
         {
             if (playground.Bounds.IsEmpty) return;
             _graphics.Clear(playground.BackColor);
-            DrawFigure(foregroundPen);
+            _extensions.DrawAll(_projector);
             playground.Invalidate();
         }
-
-        private void DrawFigure(Pen pen)
-        {
-            // HistoryPath(mainFigure);
-
-            //DrawAxis();
-
-            //DrawEllipse(pen);
-
-            // DrawMainFigure(pen);
-        }
-
-
 
         private bool TryDropVertex((float x, float y, float z) projectedVert)
         {
@@ -352,5 +365,59 @@ namespace Playground
         private float eps(float x) => (float)(x > 0 ? Math.PI / 300 : -Math.PI / 300);
 
         private float Eps(float x) => (float)(x * Math.PI / 300);
+
+        #region Fern controls
+
+        private void fern_A_Scroll(object sender, EventArgs e)
+        {
+            var br = _extensions.Get<FernBranch>();
+            if (br != default)
+            {
+                br.Alfa = (float)(fern_A.Value * 1f * Math.PI / 180);
+                fernALabel.Text = $@"Fern alfa: {fern_A.Value}";
+            }
+        }
+
+        private void fern_K0_Scroll(object sender, EventArgs e)
+        {
+            var br = _extensions.Get<FernBranch>();
+            if (br != default)
+            {
+                br.K0 = fern_K0.Value * .01f;
+                fernK0Label.Text = $@"Fern K0: {fern_K0.Value * .01f}";
+            }
+        }
+
+        private void fern_K1_Scroll(object sender, EventArgs e)
+        {
+            var br = _extensions.Get<FernBranch>();
+            if (br != default)
+            {
+                br.K1 = fern_K1.Value * .01f;
+                fernK1Label.Text = $@"Fern K1: {fern_K1.Value * .01f}";
+            }
+        }
+
+        private void fern_B_Scroll(object sender, EventArgs e)
+        {
+            var br = _extensions.Get<FernBranch>();
+            if (br != default)
+            {
+                br.Beta = (float)(fern_B.Value * 1f * Math.PI / 180);
+                fernBLabel.Text = $@"Fern beta: {fern_B.Value}";
+            }
+        }
+
+        private void fern_Lmin_Scroll(object sender, EventArgs e)
+        {
+            var br = _extensions.Get<FernBranch>();
+            if (br != default)
+            {
+                br.Lmin = fern_Lmin.Value;
+                fernLminLabel.Text = $@"Fern Lmin: {fern_Lmin.Value}";
+            }
+        }
+
+        #endregion
     }
 }

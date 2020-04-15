@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace Playground.Helpers
+namespace Playground.Projections.Abstractions
 {
     internal interface IProjectorEngine
     {

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using Playground.Helpers;
+using Playground.Projections;
+using Playground.Projections.Abstractions;
 
 namespace Playground.Models
 {
@@ -18,8 +20,8 @@ namespace Playground.Models
 
         public void FillNewtonBasins(Graphics g, int mx1, int my1)
         {
-            var mx = mx1 / 4;
-            var my = my1 / 4;
+            var mx = mx1 / 2;
+            var my = my1 / 2;
             using (var pen = new Pen(Color.White))
             {
                 for (int y = -my; y < my; y++)
@@ -30,13 +32,13 @@ namespace Playground.Models
                         Point z;
                         z.x = x * 0.005;
                         z.y = y * 0.005;
-                        Point d = z;
+                        var d = z;
 
                         while (Math.Pow(z.x, 2) + Math.Pow(z.y, 2) < Max &&
                                Math.Pow(d.x, 2) + Math.Pow(d.y, 2) > Min &&
                                n < Iterations)
                         {
-                            Point t = z;
+                            var t = z;
                             var p = Math.Pow(Math.Pow(t.x, 2) + Math.Pow(t.y, 2), 2);
                             z.x = 2f / 3 * t.x + (Math.Pow(t.x, 2) - Math.Pow(t.y, 2)) / (3 * p);
                             z.y = 2d / 3 * t.y * (1 - t.x / p);
