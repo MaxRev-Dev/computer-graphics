@@ -1,14 +1,13 @@
 ﻿using System.Drawing;
 using GraphicExtensions;
 using Playground.Helpers;
-using Playground.Projections;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Models
 {
     internal class Axis : GraphicExtension
     {
-        public override void Reset()
+        public override void Reset(IProjectorEngine projector)
         {
             Model3D = new[,]
             {
@@ -20,7 +19,7 @@ namespace Playground.Models
         }
         public override void Draw(IProjectorEngine projector)
         {
-            if (Model3D == default) Reset();
+            if (Model3D == default) Reset(projector);
 
             var colors = new[]
             {

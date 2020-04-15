@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using Playground.Projections;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Helpers
@@ -10,9 +9,9 @@ namespace Playground.Helpers
         Pen SecondaryPen { get; set; }
 
         bool Enable { get; set; }
-        float[,] Model3D { get; }
-        void Reset();
+        float[,] Model3D { get; } 
         void Draw(IProjectorEngine projector);
         void Transform(float[,] trs);
+        void Reset(IProjectorEngine projector);
     }
 }

@@ -1,13 +1,12 @@
 ﻿using GraphicExtensions;
 using Playground.Helpers;
-using Playground.Projections;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Models
 {
     internal class Cube : GraphicExtension
     {
-        public override void Reset()
+        public override void Reset(IProjectorEngine projector)
         {
             Model3D = new[,]
             {

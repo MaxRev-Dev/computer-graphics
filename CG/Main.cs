@@ -60,7 +60,7 @@ namespace Playground
             InitializeComponent();
             CreatePlayground();
 
-             _projector = new PlanarProjectorEngine(_graphics);
+            _projector = new PlanarProjectorEngine(_graphics);
             //_projector = new DimetricProjectorEngine(_graphics);
 
             Load += (s, e) =>
@@ -70,9 +70,11 @@ namespace Playground
                     //new NewtonBasins(),
                     //new Axis(),
                     //new Tetrahedron(),
-                    new Ellipsoid(),
+                    //new Ellipsoid(),
                     //new Cube(),
-                   // new FernBranch()
+                    //new FernBranch()
+                    //new Hyperbola(),
+                    new TCB_Spline()
                 });
                 InitModelAndFrameTick();
             };
@@ -111,7 +113,7 @@ namespace Playground
 
         private void ResetModel()
         {
-            _extensions.InitializeAll();
+            _extensions.InitializeAll(_projector);
 
             // Set fern's values if ext available
             if (_extensions.Get<FernBranch>() is FernBranch fern)

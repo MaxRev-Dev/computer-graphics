@@ -87,6 +87,7 @@ namespace Playground
             this.fern_A.Name = "fern_A";
             this.fern_A.Size = new System.Drawing.Size(116, 45);
             this.fern_A.TabIndex = 4;
+            this.fern_A.Visible = false;
             this.fern_A.Scroll += new System.EventHandler(this.fern_A_Scroll);
             // 
             // fern_K0
@@ -95,6 +96,7 @@ namespace Playground
             this.fern_K0.Name = "fern_K0";
             this.fern_K0.Size = new System.Drawing.Size(108, 45);
             this.fern_K0.TabIndex = 5;
+            this.fern_K0.Visible = false;
             this.fern_K0.Scroll += new System.EventHandler(this.fern_K0_Scroll);
             // 
             // fern_K1
@@ -103,6 +105,7 @@ namespace Playground
             this.fern_K1.Name = "fern_K1";
             this.fern_K1.Size = new System.Drawing.Size(108, 45);
             this.fern_K1.TabIndex = 5;
+            this.fern_K1.Visible = false;
             this.fern_K1.Scroll += new System.EventHandler(this.fern_K1_Scroll);
             // 
             // fern_B
@@ -111,6 +114,7 @@ namespace Playground
             this.fern_B.Name = "fern_B";
             this.fern_B.Size = new System.Drawing.Size(116, 45);
             this.fern_B.TabIndex = 4;
+            this.fern_B.Visible = false;
             this.fern_B.Scroll += new System.EventHandler(this.fern_B_Scroll);
             // 
             // fern_Lmin
@@ -119,6 +123,7 @@ namespace Playground
             this.fern_Lmin.Name = "fern_Lmin";
             this.fern_Lmin.Size = new System.Drawing.Size(116, 45);
             this.fern_Lmin.TabIndex = 4;
+            this.fern_Lmin.Visible = false;
             this.fern_Lmin.Scroll += new System.EventHandler(this.fern_Lmin_Scroll);
             // 
             // fernALabel

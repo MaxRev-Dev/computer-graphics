@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Playground.Projections;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Helpers
@@ -21,9 +20,9 @@ namespace Playground.Helpers
             return this.FirstOrDefault(c => c is T) as T;
         }
 
-        public void InitializeAll()
+        public void InitializeAll(IProjectorEngine projector)
         {
-            ForEach(x => x.Reset());
+            ForEach(x => x.Reset(projector));
         }
 
         public void ApplyTransformation(float[,] trs)

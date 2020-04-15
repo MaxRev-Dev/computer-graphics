@@ -4,7 +4,6 @@ using System.Windows;
 using GraphicExtensions;
 using Playground.Helpers;
 using Playground.Primitives;
-using Playground.Projections;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Models
@@ -20,7 +19,7 @@ namespace Playground.Models
           
         public override void Draw(IProjectorEngine projector)
         {
-            if (_lines.Count == 0) Reset();
+            if (_lines.Count == 0) Reset(projector);
             foreach (var line in _lines)
             {
                 DrawKochLine(projector.Graphics, line);
@@ -49,7 +48,7 @@ namespace Playground.Models
             _lines = nextGeneration;
         }
 
-        public override void Reset()
+        public override void Reset(IProjectorEngine projector)
         {
             _lines.Clear();
 

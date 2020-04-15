@@ -3,7 +3,6 @@ using System.Linq;
 using GraphicExtensions;
 using MaxRev.Extensions.Matrix;
 using Playground.Helpers;
-using Playground.Projections;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Models
@@ -15,10 +14,9 @@ namespace Playground.Models
 
         public Tetrahedron()
         {
-            Reset();
         }
 
-        public override void Reset()
+        public override void Reset(IProjectorEngine projector)
         {
             Model3D = new[,]
             {
@@ -39,7 +37,7 @@ namespace Playground.Models
         }
         public override void Draw(IProjectorEngine projector)
         {
-            if (Model3D == default) Reset();
+            if (Model3D == default) Reset(projector);
 
             for (var faceIndex = 0; faceIndex < _faces.Length; faceIndex++)
             {

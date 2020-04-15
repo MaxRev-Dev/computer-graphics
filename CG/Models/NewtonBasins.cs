@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using Playground.Helpers;
-using Playground.Projections;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Models
