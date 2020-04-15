@@ -81,7 +81,7 @@
     <Compile Include="Projections\Abstractions\ProjectorEngine.cs" />
     <Compile Include="Models\Axis.cs" />
     <Compile Include="Models\Cube.cs" />
-    <Compile Include="Models\Elipsoid.cs" />
+    <Compile Include="Models\Ellipsoid.cs" />
     <Compile Include="Helpers\ExtensionContainer.cs" />
     <Compile Include="Helpers\IGraphicExtension.cs" />
     <Compile Include="Projections\Abstractions\IProjectorEngine.cs" />

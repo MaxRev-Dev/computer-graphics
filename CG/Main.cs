@@ -59,10 +59,10 @@ namespace Playground
         {
             InitializeComponent();
             CreatePlayground();
-          
-            // _projector = new PlanarProjectorEngine(_graphics);
-             _projector = new DimetricProjectorEngine(_graphics);
-             
+
+             _projector = new PlanarProjectorEngine(_graphics);
+            //_projector = new DimetricProjectorEngine(_graphics);
+
             Load += (s, e) =>
             {
                 _extensions.AddRange(new IGraphicExtension[] {
@@ -70,9 +70,9 @@ namespace Playground
                     //new NewtonBasins(),
                     //new Axis(),
                     //new Tetrahedron(),
-                    //new Elipsoid(),
+                    new Ellipsoid(),
                     //new Cube(),
-                    new FernBranch()
+                   // new FernBranch()
                 });
                 InitModelAndFrameTick();
             };
@@ -114,7 +114,7 @@ namespace Playground
             _extensions.InitializeAll();
 
             // Set fern's values if ext available
-            if (_extensions.Get<FernBranch>() is var fern)
+            if (_extensions.Get<FernBranch>() is FernBranch fern)
             {
                 fern_A.Minimum = 0;
                 fern_A.Maximum = 90;
