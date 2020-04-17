@@ -60,21 +60,21 @@ namespace Playground
             InitializeComponent();
             CreatePlayground();
 
-            _projector = new PlanarProjectorEngine(_graphics);
-            //_projector = new DimetricProjectorEngine(_graphics);
+            //_projector = new PlanarProjectorEngine(_graphics);
+            _projector = new DimetricProjectorEngine(_graphics);
 
             Load += (s, e) =>
             {
                 _extensions.AddRange(new IGraphicExtension[] {
                     //new KochSnowflake(foregroundPen),
                     //new NewtonBasins(),
-                    //new Axis(),
+                    new Axis(),
                     //new Tetrahedron(),
-                    //new Ellipsoid(),
+                    new Ellipsoid(),
                     //new Cube(),
                     //new FernBranch()
-                    //new Hyperbola(),
-                    new TCB_Spline()
+                   // new Hyperbola(),
+                    //new TCB_Spline()
                 });
                 InitModelAndFrameTick();
             };

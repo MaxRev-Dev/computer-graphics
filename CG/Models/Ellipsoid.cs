@@ -44,7 +44,7 @@ namespace Playground.Models
         private float[,] GenerateElipsoid()
         {
             var points = new List<float[]>();
-            var n = 5;
+            var n = 20;
 
             // -pi/2 <= tet <= pi/2
             // 0 <= lam <= 2pi 

@@ -53,6 +53,11 @@ namespace GraphicExtensions
             return ret;
         }
 
+        public static float[] MultiplyNorm(this float[] a, float[,] matrix)
+        {
+            return Multiply(a, matrix).Normalize();
+        }
+
         public static float[] Multiply(this float[] a, float[,] matrix)
         {
             var res = new float[a.Length];
@@ -61,7 +66,7 @@ namespace GraphicExtensions
                 var i = 0;
                 res[u] = a.Aggregate(0f, (acc, x) => acc + x * matrix[u, i++]);
             }
-            return res.Normalize();
+            return res;
         }
 
         public static float[] Add(float[] a, float[] b)

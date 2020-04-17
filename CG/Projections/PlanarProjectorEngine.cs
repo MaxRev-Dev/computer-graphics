@@ -40,8 +40,8 @@ namespace Playground.Projections
 
         public override (float x, float y) ProjectVertexToScreen(float[] vertex3d)
         {
-            var vertCamera = vertex3d.Multiply(worldToCamera);
-            return PointToScreen(vertCamera.Multiply(projMatrix));
+            var vertCamera = vertex3d.MultiplyNorm(worldToCamera);
+            return PointToScreen(vertCamera.MultiplyNorm(projMatrix));
         }
 
     }

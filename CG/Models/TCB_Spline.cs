@@ -10,6 +10,8 @@ namespace Playground.Models
     {
         public bool IsClosedSpline { get; set; }
 
+        public bool VisualizeAsPoints { get; set; }
+
         public int IntermediatePoints { get; set; } = 100;
 
         public List<SplinePoint> KeyPoints { get; } = new List<SplinePoint>();
@@ -28,12 +30,14 @@ namespace Playground.Models
                     j = tcbSpline.IsClosedSpline ? tcbSpline.KeyPoints.Count - 1 : i;
                 }
 
+                // previous
                 var point1 = tcbSpline.KeyPoints[j];
                 j = i + 1;
                 if (j > tcbSpline.KeyPoints.Count - 1)
                 {
                     j = tcbSpline.IsClosedSpline ? 0 : i;
                 }
+                // middle
                 var point2 = tcbSpline.KeyPoints[j];
 
                 j++;
@@ -41,13 +45,15 @@ namespace Playground.Models
                 {
                     j = tcbSpline.IsClosedSpline ? 0 : i;
                 }
+                //next
                 var point3 = tcbSpline.KeyPoints[j];
 
                 var tension = tcbSpline.KeyPoints[i].Tension;
                 var continuity = tcbSpline.KeyPoints[i].Continuity;
                 var bias = tcbSpline.KeyPoints[i].Bias;
 
-                var r1 = 0.5f * (1 - tension) *
+                // (0) - 1 (kps) - (2)
+                var incoming = 0.5f * (1 - tension) *
                          ((1 + bias) * (1 - continuity) * (tcbSpline.KeyPoints[i].Position - point1.Position) +
                           (1 - bias) * (1 + continuity) * (point2.Position - tcbSpline.KeyPoints[i].Position));
 
@@ -55,14 +61,15 @@ namespace Playground.Models
                 continuity = point2.Continuity;
                 bias = point2.Bias;
 
-                var r2 = 0.5f * (1 - tension) *
+                // (1) - 2 (kps) - (3) next
+                var outgoing = 0.5f * (1 - tension) *
                          ((1 + bias) * (1 + continuity) * (point2.Position - tcbSpline.KeyPoints[i].Position) +
                           (1 - bias) * (1 - continuity) * (point3.Position - point2.Position));
 
                 for (var k = 0; k < tcbSpline.IntermediatePoints; k++)
                 {
                     var t = (float)k / (tcbSpline.IntermediatePoints - 1);
-                    var v = Interpolate(t, tcbSpline.KeyPoints[i].Position, point2.Position, r1, r2);
+                    var v = Interpolate(t, tcbSpline.KeyPoints[i].Position, point2.Position, incoming, outgoing);
                     yield return v;
                 }
             }
@@ -78,17 +85,25 @@ namespace Playground.Models
 
         public override void Reset(IProjectorEngine projector)
         {
-            int N = 10;
+            /*var s = new Vector3(1*//*00f*//*, 1, 1);
+
+            KeyPoints.Add(new SplinePoint(new Vector3(1, 28, 0) * s));
+            KeyPoints.Add(new SplinePoint(new Vector3(1.5f, 96, 0) * s));
+            KeyPoints.Add(new SplinePoint(new Vector3(2, 117, 0) * s));
+            KeyPoints.Add(new SplinePoint(new Vector3(2.5f, 181, 0) * s));
+            KeyPoints.Add(new SplinePoint(new Vector3(3, 106, 0) * s));
+            return;*/
+            int randomPoints = 10;
 
             // randomize on each redraw
             KeyPoints.Clear();
             var b = projector.Graphics.VisibleClipBounds;
 
             int prewX = 100, prewY = 200;
-            int stepX = (int)((b.Width - prewX) / (N + 1));
-            int stepY = (int)((b.Height - prewY) / (N + 2));
+            int stepX = (int)((b.Width - prewX) / (randomPoints + 1));
+            int stepY = (int)((b.Height - prewY) / (randomPoints + 2));
 
-            for (int i = 0, rit = 1; i < N; i++, rit++)
+            for (int i = 0, rit = 1; i < randomPoints; i++, rit++)
             {
                 var (c1, c2) = (_rand.Next(stepX * rit, stepX * (rit + 1)),
                     _rand.Next(stepY * rit, stepY * (rit + 3)));
@@ -105,36 +120,58 @@ namespace Playground.Models
 
         public override void Draw(IProjectorEngine projector)
         {
+            var s = 100;
+            // draw keypoints
+            foreach (var point in KeyPoints)
+            {
+                projector.Graphics.DrawEllipse(SecondaryPen, (point.Position.X) * s, (point.Position.Y), 3, 3);
+            }
+
+            // draw spline points
             using (var rx = GetSplinePoints().GetEnumerator())
             {
-                if (rx.MoveNext())
-                {
-                    var current = rx.Current;
+                if (!VisualizeAsPoints && !rx.MoveNext())
+                    return;
+                var current = rx.Current;
 
-                    while (rx.MoveNext())
+                while (rx.MoveNext())
+                {
+                    var point = rx.Current;
+                    if (VisualizeAsPoints)
                     {
-                        var point = rx.Current;
-                        //projector.Graphics.DrawLine(PrimaryPen, point.X, point.Y, current.X, current.Y);
-                        projector.Graphics.DrawEllipse(PrimaryPen, point.X, point.Y, 1,1);
+                        projector.Graphics.DrawEllipse(PrimaryPen, point.X, point.Y, 1, 1);
+                    }
+                    else
+                    {
+                        projector.Graphics.DrawLine(PrimaryPen, point.X * s, point.Y, current.X * s, current.Y);
                         current = point;
                     }
                 }
-
             }
-
-            foreach (var point in KeyPoints)
-            {
-                projector.Graphics.DrawEllipse(SecondaryPen, point.Position.X - 1, point.Position.Y - 1, 3, 3);
-            }
-
         }
     }
 
     public class SplinePoint
     {
-        public float Tension { get; set; } = 0.08f;
-        public float Continuity { get; set; } = .06f;
-        public float Bias { get; set; } = 0.07f;
+        public SplinePoint()
+        {
+        }
+
+        public SplinePoint(Vector3 position)
+        {
+            Position = position;
+        }
+
+        public SplinePoint(Vector3 position, float tension, float continuity, float bias)
+        {
+            Position = position;
+            Tension = tension;
+            Continuity = continuity;
+            Bias = bias;
+        }
         public Vector3 Position { get; set; }
+        public float Tension { get; set; } = 1.7559526299369238988603263643669f;
+        public float Continuity { get; set; } = 1.0158736798317970636275369716452f;
+        public float Bias { get; set; } = 0.49603158004205073409311575708871f;
     }
 }

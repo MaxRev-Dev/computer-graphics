@@ -10,11 +10,7 @@ namespace Playground.Models
     internal sealed class Tetrahedron : GraphicExtension
     {
         // model  faces
-        private int[][] _faces;
-
-        public Tetrahedron()
-        {
-        }
+        private int[][] _faces; 
 
         public override void Reset(IProjectorEngine projector)
         {

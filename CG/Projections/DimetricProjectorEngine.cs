@@ -12,8 +12,8 @@ namespace Playground.Projections
         {
         }
 
-        public float PSI { get; set; } = (float)(45f * Math.PI / 180);
-        public float PHI { get; set; } = (float)(45f * Math.PI / 180);
+        public float PSI { get; set; } = (float)(30f * Math.PI / 180);
+        public float PHI { get; set; } = (float)(75f * Math.PI / 180);
 
         private readonly Func<float, float, float[,]> _project = (psi, ph) => new[,]
         {
@@ -34,12 +34,17 @@ namespace Playground.Projections
             {-0.7071f, -0.408f, 0,0},
             {0, 0, 0,1},
         };
-         
+
+        protected override (float x, float y) PointToScreen(float[] point2D)
+        {
+            return (point2D[0] * 100 + 0.5f * DrawableWidth,
+                point2D[1] * 100 + 0.5f * DrawableHeight);
+        }
+
         public override (float x, float y) ProjectVertexToScreen(float[] vertex3d)
         {
-            var point = vertex3d.Multiply(_project(PSI, PHI));
+            var point = vertex3d.Multiply(/*_project(PSI, PHI)*/basicIso);
             return PointToScreen(point);
-
         }
     }
 }
