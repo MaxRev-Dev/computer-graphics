@@ -6,18 +6,25 @@ using Playground.Projections.Abstractions;
 
 namespace Playground.Models
 {
-    internal class Axis : GraphicExtension
+    internal sealed class Axis : GraphicExtension
     {
+        public Axis()
+        {
+            Global = true;
+        }
+
         public override void Reset(IProjectorEngine projector)
         {
             Model3D = new[,]
             {
                 {0f, 0, 0, 1},
                 {1f, 0, 0, 1},
-                {0, 1, 0, 1},
+                {0, -1, 0, 1},
                 {0, 0, 1, 1}
             };
+            base.Reset(projector);
         }
+
         public override void Draw(IProjectorEngine projector)
         {
             if (Model3D == default) Reset(projector);
@@ -35,9 +42,9 @@ namespace Playground.Models
                 projector.Graphics.DrawLine(colors[i - 1], new PointF(x1, y1), new PointF(x2, y2));
             }
 
-            GrawAxisName(projector,"x", Model3D.point(1));
+            GrawAxisName(projector, "x", Model3D.point(1));
             GrawAxisName(projector, "y", Model3D.point(2));
-            GrawAxisName(projector, "z", Model3D.point(3)); 
+            GrawAxisName(projector, "z", Model3D.point(3));
         }
 
         private void GrawAxisName(IProjectorEngine projector, string name, (float x, float y, float z) vertex)

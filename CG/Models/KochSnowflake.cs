@@ -63,6 +63,7 @@ namespace Playground.Models
             _lines.Add(s1);
             _lines.Add(s2);
             _lines.Add(s3);
+            base.Reset(projector);
         }
     }
 }

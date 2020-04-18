@@ -2,6 +2,7 @@
 using System.Drawing;
 using GraphicExtensions;
 using MaxRev.Extensions.Binary;
+using Playground.Helpers;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Projections
@@ -12,9 +13,11 @@ namespace Playground.Projections
         {
         }
 
+        [Modifiable]
         public bool UseBasicIsometry { get; set; }
-
+        [Modifiable]
         public float PSI { get; set; } = (float)(30f * Math.PI / 180);
+        [Modifiable]
         public float PHI { get; set; } = (float)(75f * Math.PI / 180);
 
         private readonly Func<float, float, float[,]> _project = (psi, ph) => new[,]

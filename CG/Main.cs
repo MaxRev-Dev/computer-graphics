@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -65,17 +67,19 @@ namespace Playground
 
             Load += (s, e) =>
             {
-                _extensions.AddRange(new IGraphicExtension[] {
-                    //new KochSnowflake(foregroundPen),
-                    //new NewtonBasins(),
-                   // new Axis(),
-                    //new Tetrahedron(),
-                    //new Ellipsoid(),
-                    //new Cube(),
-                    //new FernBranch()
-                   // new Hyperbola(),
-                   new TCB_Spline()
+                _extensions.AddRange(new IGraphicExtension[]
+                {
+                    new KochSnowflake(foregroundPen),
+                   // new NewtonBasins(),
+                    new Axis(),
+                    new Tetrahedron(),
+                    new Ellipsoid(),
+                    new Cube(),
+                    new FernBranch(),
+                    new Hyperbola(),
+                    new TCBSpline()
                 });
+                BindExtensionControls();
                 InitModelAndFrameTick();
             };
 
@@ -85,6 +89,38 @@ namespace Playground
             playground.Paint += (s, e) => e.Graphics.DrawImage(_bitmap, 0, 0);
             _testOutputBuilder = new StringBuilder();
             _testOutputWriter = new StringWriter(_testOutputBuilder);
+
+        }
+
+        private void BindExtensionControls()
+        {
+            var binder = new AttributeBinder();
+            tabs.SelectedIndexChanged += (s, e) =>
+            {
+                var tab = tabs.SelectedTab;
+                var name = tab.Text;
+                _extensions.ActiveChanged(_extensions.FirstOrDefault(x => x.GetType().Name == name));
+            };
+            foreach (var extension in _extensions)
+            {
+                var name = extension.GetType().Name;
+                var page = new TabPage { Text = name };
+                tabs.TabPages.Add(page);
+                var floater = new FlowLayoutPanel { Dock = DockStyle.Fill };
+                page.Controls.Add(floater);
+                foreach (var prop in extension.GetType().GetProperties())
+                {
+                    binder.BindTo(floater, extension, prop);
+                }
+            }
+
+            binder.OnRedraw += (e, reset) =>
+            {
+                if (reset)
+                    e.Reset(_projector);
+                Draw();
+            };
+
 
         }
 
@@ -98,7 +134,7 @@ namespace Playground
             ResetAll();
             var timer = new Timer
             {
-                Interval = 33 // 33 ms/frame ≈ (30.3fps)
+                Interval = 33
             };
             timer.Start();
             timer.Tick += OnFrame;
@@ -113,29 +149,7 @@ namespace Playground
 
         private void ResetModel()
         {
-            _extensions.InitializeAll(_projector);
-
-            // Set fern's values if ext available
-            if (_extensions.Get<FernBranch>() is FernBranch fern)
-            {
-                fern_A.Minimum = 0;
-                fern_A.Maximum = 90;
-                fern_K0.Minimum = 0;
-                fern_K0.Maximum = 100;
-                fern_K1.Minimum = 0;
-                fern_K1.Maximum = 180;
-                fern_B.Minimum = 0;
-                fern_B.Maximum = 180;
-                fern_Lmin.Minimum = 10;
-                fern_Lmin.Maximum = 1000;
-                fern_Lmin.Value = (int)fern.Lmin;
-                fern_K0.Value = (int)fern.K0 * 100;
-                fern_K1.Value = (int)fern.K1 * 100;
-                fern_B.Value = (int)(fern.Beta / Math.PI * 180);
-                fern_A.Value = (int)(fern.Alfa / Math.PI * 180);
-            }
-
-            //Transform(CG.TranslateZ(-10));
+            _extensions.InitializeAll(_projector); 
         }
         #endregion
 
@@ -221,9 +235,11 @@ namespace Playground
 
         #region Keys & wheel
 
+        private readonly float[,] _defaultTrs = MatrixExtensions.IdentityF(4);
+
         private bool CheckKeys()
         {
-            var trs = MatrixExtensions.IdentityF(4);
+            var trs = _defaultTrs;
             var modCtrl = Keyboard.Modifiers.HasFlag(System.Windows.Input.ModifierKeys.Control);
             var modAlt = Keyboard.Modifiers.HasFlag(System.Windows.Input.ModifierKeys.Alt);
             var tens = Eps(1) * 10;
@@ -294,7 +310,7 @@ namespace Playground
         private bool IsPressed(Key key)
         {
             var left = Keyboard.GetKeyStates(key);
-            return ((left & KeyStates.Down) != 0);
+            return ((left & KeyStates.Down) != 0) && ContainsFocus;
         }
 
         private void CG_MouseWheel(object sender, MouseEventArgs e)
@@ -325,15 +341,29 @@ namespace Playground
             CreatePlayground();
             playground.Invalidate();
         }
-
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            var modCtrl = Keyboard.Modifiers.HasFlag(System.Windows.Input.ModifierKeys.Control);
+            var modAlt = Keyboard.Modifiers.HasFlag(System.Windows.Input.ModifierKeys.Alt);
+            if (!msg.HWnd.Equals(this.Handle) &&
+                (keyData == Keys.Left || keyData == Keys.Right ||
+                 keyData == Keys.Up || keyData == Keys.Down) && !(modAlt || modCtrl))
+                return true;
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
         #endregion
 
 
-        private void Draw()
+        private void Draw(IGraphicExtension extension = default)
         {
             if (!ValidateGraphics()) return;
             _graphics.Clear(playground.BackColor);
-            _extensions.DrawAll(_projector);
+            if (extension == default)
+                _extensions.DrawAll(_projector);
+            else
+            {
+                extension.Draw(_projector);
+            }
             playground.Invalidate();
         }
 
@@ -374,59 +404,5 @@ namespace Playground
         private float eps(float x) => (float)(x > 0 ? Math.PI / 300 : -Math.PI / 300);
 
         private float Eps(float x) => (float)(x * Math.PI / 300);
-
-        #region Fern controls
-
-        private void fern_A_Scroll(object sender, EventArgs e)
-        {
-            var br = _extensions.Get<FernBranch>();
-            if (br != default)
-            {
-                br.Alfa = (float)(fern_A.Value * 1f * Math.PI / 180);
-                fernALabel.Text = $@"Fern alfa: {fern_A.Value}";
-            }
-        }
-
-        private void fern_K0_Scroll(object sender, EventArgs e)
-        {
-            var br = _extensions.Get<FernBranch>();
-            if (br != default)
-            {
-                br.K0 = fern_K0.Value * .01f;
-                fernK0Label.Text = $@"Fern K0: {fern_K0.Value * .01f}";
-            }
-        }
-
-        private void fern_K1_Scroll(object sender, EventArgs e)
-        {
-            var br = _extensions.Get<FernBranch>();
-            if (br != default)
-            {
-                br.K1 = fern_K1.Value * .01f;
-                fernK1Label.Text = $@"Fern K1: {fern_K1.Value * .01f}";
-            }
-        }
-
-        private void fern_B_Scroll(object sender, EventArgs e)
-        {
-            var br = _extensions.Get<FernBranch>();
-            if (br != default)
-            {
-                br.Beta = (float)(fern_B.Value * 1f * Math.PI / 180);
-                fernBLabel.Text = $@"Fern beta: {fern_B.Value}";
-            }
-        }
-
-        private void fern_Lmin_Scroll(object sender, EventArgs e)
-        {
-            var br = _extensions.Get<FernBranch>();
-            if (br != default)
-            {
-                br.Lmin = fern_Lmin.Value;
-                fernLminLabel.Text = $@"Fern Lmin: {fern_Lmin.Value}";
-            }
-        }
-
-        #endregion
     }
 }

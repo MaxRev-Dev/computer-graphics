@@ -12,7 +12,7 @@ namespace Playground.Models
             public double x;
             public double y;
         }
-
+        [Modifiable(Max = 100, Min = 1, Scaling = 1)]
         public int Iterations { get; set; } = 20;
         public double Min { get; set; } = 1e-8;
         public double Max { get; set; } = 1e+8;
@@ -57,10 +57,10 @@ namespace Playground.Models
         public override void Draw(IProjectorEngine projector)
         {
             var graphics = projector.Graphics;
-            FillNewtonBasins(graphics, 
+            FillNewtonBasins(graphics,
                 (int)graphics.VisibleClipBounds.Width,
                 (int)graphics.VisibleClipBounds.Height);
         }
-          
+
     }
 }

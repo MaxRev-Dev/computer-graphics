@@ -21,6 +21,7 @@ namespace Playground.Models
                 {0f, 1, 0, 1},
                 {1f, 1, 0.5f, 1},
             };
+            base.Reset(projector);
         }
 
         public override void Draw(IProjectorEngine projector)

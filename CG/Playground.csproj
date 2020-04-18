@@ -78,8 +78,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\AttributeBinder.cs" />
+    <Compile Include="Helpers\ModifiableAttribute.cs" />
     <Compile Include="Models\Hyperbola.cs" />
-    <Compile Include="Models\TCB_Spline.cs" />
+    <Compile Include="Models\TCBSpline.cs" />
     <Compile Include="Projections\DimetricProjectorEngine.cs" />
     <Compile Include="Projections\Abstractions\ProjectorEngine.cs" />
     <Compile Include="Models\Axis.cs" />

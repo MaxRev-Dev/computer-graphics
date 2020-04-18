@@ -6,11 +6,13 @@ namespace Playground.Helpers
 {
     internal class ExtensionContainer : List<IGraphicExtension>
     {
+        private IGraphicExtension _active;
+
         public void DrawAll(IProjectorEngine projector)
         {
             foreach (var extension in this)
             {
-                if (extension.Enable)
+                if (extension.Enable && extension.Global || extension == _active)
                     extension.Draw(projector);
             }
         }
@@ -29,6 +31,12 @@ namespace Playground.Helpers
         {
             foreach (var v in this.Where(x => x.Model3D != default))
                 v.Transform(trs);
+        }
+
+        public void ActiveChanged(IGraphicExtension extension)
+        {
+            if (extension != default)
+                _active = extension;
         }
     }
 }

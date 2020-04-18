@@ -10,13 +10,19 @@ using MaxRev.Extensions.Matrix;
 
 namespace Playground.Models
 {
-    internal class TCB_Spline : GraphicExtension
+    internal class TCBSpline : GraphicExtension
     {
+        [Modifiable(RequiresReset = false)]
         public bool IsClosedSpline { get; set; }
 
+        [Modifiable(RequiresReset = false)]
         public bool VisualizeAsPoints { get; set; }
 
+        [Modifiable(Scaling = 1, Min = 1, Max = 1000)]
         public int IntermediatePoints { get; set; } = 100;
+
+        [Modifiable]
+        public bool Preserve3D { get; set; } = true;
 
         public List<SplinePoint> KeyPoints { get; } = new List<SplinePoint>();
 
@@ -125,6 +131,7 @@ namespace Playground.Models
                     Tension = (float)_rand.NextDouble() * 2 - 1,
                 });
             }
+            base.Reset(projector);
         }
 
         public override float[,] Model3D
@@ -139,9 +146,6 @@ namespace Playground.Models
                 }
             }
         }
-
-        public bool Preserve3D { get; set; } = true;
-
         public override void Draw(IProjectorEngine projector)
         {
             // draw keypoints
