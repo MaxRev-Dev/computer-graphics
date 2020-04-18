@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Numerics;
 using GraphicExtensions;
 
 namespace Playground.Projections.Abstractions
@@ -17,7 +18,12 @@ namespace Playground.Projections.Abstractions
         {
             return ((point2D[0] + 1) * 0.5f * DrawableWidth,
                 (point2D[1] + 1) * 0.5f * DrawableHeight);
-        } 
+        }
+
+        public (float x, float y) ProjectVertexToScreen(Vector3 vertex3d)
+        {
+            return ProjectVertexToScreen(new[] { vertex3d.X, vertex3d.Y, vertex3d.Z });
+        }
 
         public (float x, float y) ProjectVertexToScreen((float x, float y, float z) vertex3d)
         {

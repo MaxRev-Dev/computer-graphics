@@ -12,6 +12,8 @@ namespace Playground.Projections
         {
         }
 
+        public bool UseBasicIsometry { get; set; }
+
         public float PSI { get; set; } = (float)(30f * Math.PI / 180);
         public float PHI { get; set; } = (float)(75f * Math.PI / 180);
 
@@ -43,7 +45,7 @@ namespace Playground.Projections
 
         public override (float x, float y) ProjectVertexToScreen(float[] vertex3d)
         {
-            var point = vertex3d.Multiply(/*_project(PSI, PHI)*/basicIso);
+            var point = vertex3d.Multiply(UseBasicIsometry ? basicIso : _project(PSI, PHI));
             return PointToScreen(point);
         }
     }

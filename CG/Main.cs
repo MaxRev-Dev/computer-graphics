@@ -60,21 +60,21 @@ namespace Playground
             InitializeComponent();
             CreatePlayground();
 
-            //_projector = new PlanarProjectorEngine(_graphics);
-            _projector = new DimetricProjectorEngine(_graphics);
+            _projector = new PlanarProjectorEngine(_graphics);
+            //_projector = new DimetricProjectorEngine(_graphics);
 
             Load += (s, e) =>
             {
                 _extensions.AddRange(new IGraphicExtension[] {
                     //new KochSnowflake(foregroundPen),
                     //new NewtonBasins(),
-                    new Axis(),
+                   // new Axis(),
                     //new Tetrahedron(),
-                    new Ellipsoid(),
+                    //new Ellipsoid(),
                     //new Cube(),
                     //new FernBranch()
                    // new Hyperbola(),
-                    //new TCB_Spline()
+                   new TCB_Spline()
                 });
                 InitModelAndFrameTick();
             };
@@ -148,7 +148,7 @@ namespace Playground
         {
             _bitmap?.Dispose();
             _graphics?.Dispose();
-            if (playground.Bounds.IsEmpty) return;
+            if (!ValidateGraphics()) return;
             _bitmap = new Bitmap(playground.Bounds.Width, playground.Bounds.Height);
             _graphics = Graphics.FromImage(_bitmap);
             _projector?.Use(_graphics);
@@ -331,10 +331,17 @@ namespace Playground
 
         private void Draw()
         {
-            if (playground.Bounds.IsEmpty) return;
+            if (!ValidateGraphics()) return;
             _graphics.Clear(playground.BackColor);
             _extensions.DrawAll(_projector);
             playground.Invalidate();
+        }
+
+        private bool ValidateGraphics()
+        {
+            return !(playground.Bounds.IsEmpty ||
+                     playground.Bounds.Height == 0 ||
+                     playground.Bounds.Width == 0);
         }
 
         private bool TryDropVertex((float x, float y, float z) projectedVert)
