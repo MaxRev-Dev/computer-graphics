@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using MaxRev.Extensions.Matrix;
@@ -7,6 +8,44 @@ namespace GraphicExtensions
 {
     public static class CG
     {
+        public static bool ContainsPoint(this IEnumerable<(float x, float y)> polygon, (float x, float y) p)
+        {
+            return ContainsPoint(polygon.Select(x => new Point(x.x, x.y)).ToArray(), new Point(p.x, p.y));
+        }
+
+        public static bool ContainsPoint(this Point[] polygon, Point p)
+        {
+            double minX = polygon[0].X;
+            double maxX = polygon[0].X;
+            double minY = polygon[0].Y;
+            double maxY = polygon[0].Y;
+            for (int i = 1; i < polygon.Length; i++)
+            {
+                Point q = polygon[i];
+                minX = Math.Min(q.X, minX);
+                maxX = Math.Max(q.X, maxX);
+                minY = Math.Min(q.Y, minY);
+                maxY = Math.Max(q.Y, maxY);
+            }
+
+            if (p.X < minX || p.X > maxX || p.Y < minY || p.Y > maxY)
+            {
+                return false;
+            }
+
+            // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+            bool inside = false;
+            for (int i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
+            {
+                if ((polygon[i].Y > p.Y) != (polygon[j].Y > p.Y) &&
+                    p.X < (polygon[j].X - polygon[i].X) * (p.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) + polygon[i].X)
+                {
+                    inside = !inside;
+                }
+            }
+
+            return inside;
+        }
         public static double Heading(this Vector v)
         {
             return Math.Atan2(v.Y, v.X);
@@ -202,7 +241,7 @@ namespace GraphicExtensions
         };
 
         public static float[,] TranslateEllipseXZ(float a, float b, float t) => new[,]
-        { 
+        {
             {1f, 0, 0, 0},
             {0, 1, 0, 0},
             {0, 0, 1, 0},
@@ -233,13 +272,29 @@ namespace GraphicExtensions
             {0, 0, i, 1}
         };
 
-        public static float[] FigureCenter(float[,] mainFigure)
+        public static float[] FigureCenter(this float[,] model)
         {
-            var verts = mainFigure.GetLength(0);
+            var verts = model.GetLength(0);
             return Enumerable.Range(0, verts)
-                .Select(i => mainFigure.GetRow(i))
+                .Select(i => model.GetRow(i))
                 .Aggregate(new float[4], (x, acc) => Add(acc, x))
                 .Select(x => x / verts).ToArray();
+        }
+        public static float[] Polygon2DCenter(this float[][] polygon)
+        {
+            var verts = polygon.Length;
+            return Enumerable.Range(0, verts)
+                .Select(i => polygon[i])
+                .Aggregate(new float[2], (x, acc) => Add(acc, x))
+                .Select(x => x / verts).ToArray();
+        }
+        public static (float x, float y, float z) Polygon3DCenter(this (float x, float y, float z)[] polygon)
+        {
+            var verts = polygon.Length;
+            return Enumerable.Range(0, verts)
+                .Select(i => polygon[i])
+                .Aggregate(new float[3], (x, acc) => Add(acc.ToArray(), x))
+                .Select(x => x / verts).ToArray().ToPoint3D();
         }
     }
 }

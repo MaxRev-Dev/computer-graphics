@@ -172,9 +172,8 @@ namespace Playground.Models
                         projector.Graphics.DrawEllipse(PrimaryPen, x1, y1, 1, 1);
                     }
                     else
-                    {
-                        var (x2, y2) = projector.ProjectVertexToScreen(current);
-                        projector.Graphics.DrawLine(PrimaryPen, x1, y1, x2, y2);
+                    { 
+                        projector.DrawLine(PrimaryPen, point, current);
                         current = point;
                     }
                 }

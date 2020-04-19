@@ -62,7 +62,7 @@ namespace Playground
             InitializeComponent();
             CreatePlayground();
 
-            _projector = new PlanarProjectorEngine(_graphics);
+            _projector = new PlanarProjectorEngine(_bitmap, _graphics);
             //_projector = new DimetricProjectorEngine(_graphics);
 
             Load += (s, e) =>
@@ -149,7 +149,7 @@ namespace Playground
 
         private void ResetModel()
         {
-            _extensions.InitializeAll(_projector); 
+            _extensions.InitializeAll(_projector);
         }
         #endregion
 
@@ -165,7 +165,7 @@ namespace Playground
             if (!ValidateGraphics()) return;
             _bitmap = new Bitmap(playground.Bounds.Width, playground.Bounds.Height);
             _graphics = Graphics.FromImage(_bitmap);
-            _projector?.Use(_graphics);
+            _projector?.Use(_graphics, _bitmap);
         }
 
         private void OnFrame(object sender, EventArgs e)

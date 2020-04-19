@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using GraphicExtensions;
 using MaxRev.Extensions.Matrix;
@@ -10,7 +12,7 @@ namespace Playground.Models
     internal sealed class Tetrahedron : GraphicExtension
     {
         // model  faces
-        private int[][] _faces; 
+        private int[][] _faces;
 
         public override void Reset(IProjectorEngine projector)
         {
@@ -32,31 +34,35 @@ namespace Playground.Models
             };
             base.Reset(projector);
         }
+
+        [Modifiable(RequiresReset = false)]
+        public bool TryFill { get; set; }
+
         public override void Draw(IProjectorEngine projector)
         {
             if (Model3D == default) Reset(projector);
 
+
+            var order = new List<(bool, (float x, float y, float z)[])>();
             for (var faceIndex = 0; faceIndex < _faces.Length; faceIndex++)
             {
-                var path = new List<(float x, float y)>();
                 var face = GetFace(faceIndex).ToArray();
-                foreach (var edge in face)
-                {
-                    var projectedVert = projector.ProjectVertexToScreen(edge);
-                    path.Add(projectedVert);
-                }
 
                 var isVisible = IsVisibleFace(projector.ViewVector, face);
 
-                for (var i = 0; i < path.Count; i++)
-                    for (var j = i + 1; j < path.Count; j++)
-                        projector.Graphics.DrawLine(isVisible ? PrimaryPen : SecondaryPen, path[i].x, path[i].y,
-                            path[j].x, path[j].y);
-                /*var points = path.Select(x => new PointF(x.x, x.y)).ToArray();
-                _graphics.FillPolygon(isVisible ? Brushes.PaleGreen : Brushes.Aquamarine, points);*/
+                order.Add((isVisible, face));
+            }
+            foreach (var face in
+                order.OrderBy(x => x.Item1))
+            {
+                // trying to fill it with flood fill 
+                if (TryFill)
+                    projector.FillPolygon(!face.Item1 ? Brushes.ForestGreen : Brushes.PaleGreen, face.Item2);
+                projector.Graphics.DrawPolygon(PrimaryPen,
+                    face.Item2.Select(projector.ProjectVertexToScreen).Select(x => new PointF(x.x, x.y)).ToArray());
             }
         }
-         
+
         private bool IsVisibleFace(float[] viewVector, (float x, float y, float z)[] edge)
         {
             /*
@@ -80,6 +86,6 @@ namespace Playground.Models
             {
                 yield return Model3D.point(_faces[faceIndex][i]);
             }
-        } 
+        }
     }
 }

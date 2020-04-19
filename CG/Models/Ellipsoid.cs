@@ -25,12 +25,8 @@ namespace Playground.Models
                     projector.Graphics.DrawEllipse(pen, x, y, vertexSize, vertexSize);
                 }
                 foreach (var edge in _edges)
-                {
-                    var (i1, i2) = (edge[0], edge[1]);
-                    var (x1, y1) = projector.ProjectVertexToScreen(Model3D.point(i1).ToArray());
-                    var (x2, y2) = projector.ProjectVertexToScreen(Model3D.point(i2).ToArray());
-                    projector.Graphics.DrawLine(pen, x1, y1, x2, y2);
-
+                { 
+                    projector.DrawLine(pen, Model3D.point(edge[0]), Model3D.point(edge[1]));
                 }
             }
             catch (IndexOutOfRangeException)

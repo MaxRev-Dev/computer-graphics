@@ -7,7 +7,7 @@ namespace Playground.Projections
 {
     internal class PlanarProjectorEngine : ProjectorEngine
     {
-        public PlanarProjectorEngine(Graphics graphics) : base(graphics)
+        public PlanarProjectorEngine(Bitmap bitmap, Graphics graphics) : base(bitmap, graphics)
         {
         }
 

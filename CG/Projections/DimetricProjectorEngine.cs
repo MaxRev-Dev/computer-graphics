@@ -9,7 +9,7 @@ namespace Playground.Projections
 {
     internal class DimetricProjectorEngine : ProjectorEngine
     {
-        public DimetricProjectorEngine(Graphics graphics) : base(graphics)
+        public DimetricProjectorEngine(Bitmap bitmap, Graphics graphics) : base(bitmap, graphics)
         {
         }
 

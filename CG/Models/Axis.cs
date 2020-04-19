@@ -37,9 +37,7 @@ namespace Playground.Models
             };
             for (var i = 1; i < Model3D.GetLength(0); i++)
             {
-                var (x1, y1) = projector.ProjectVertexToScreen(Model3D.point(i));
-                var (x2, y2) = projector.ProjectVertexToScreen(Model3D.point(0));
-                projector.Graphics.DrawLine(colors[i - 1], new PointF(x1, y1), new PointF(x2, y2));
+                projector.DrawLine(colors[i - 1], Model3D.point(i), Model3D.point(0));
             }
 
             GrawAxisName(projector, "x", Model3D.point(1));

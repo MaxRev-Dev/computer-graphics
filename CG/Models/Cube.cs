@@ -29,10 +29,8 @@ namespace Playground.Models
             for (int i = 1; i < Model3D.GetLength(0); i++)
                 // TODO: find out how to loop around all edges
                 for (int j = i + 1; j < Model3D.GetLength(0); j++)
-                {
-                    var (x1, y1) = projector.ProjectVertexToScreen(Model3D.point(i));
-                    var (x2, y2) = projector.ProjectVertexToScreen(Model3D.point(j));
-                    projector.Graphics.DrawLine(PrimaryPen, x1, y1, x2, y2);
+                { 
+                    projector.DrawLine(PrimaryPen, Model3D.point(i), Model3D.point(j));
                 }
         }
     }
