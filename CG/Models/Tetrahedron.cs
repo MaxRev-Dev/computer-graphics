@@ -37,29 +37,37 @@ namespace Playground.Models
 
         [Modifiable(RequiresReset = false)]
         public bool TryFill { get; set; }
+        [Modifiable(RequiresReset = false)]
+        public bool NativeFill { get; set; }
 
         public override void Draw(IProjectorEngine projector)
         {
             if (Model3D == default) Reset(projector);
 
-
-            var order = new List<(bool, (float x, float y, float z)[])>();
+            var vv = projector.ViewVector(Model3D);
+            var order = new List<(bool isVisible, (float x, float y, float z)[] Location)>();
             for (var faceIndex = 0; faceIndex < _faces.Length; faceIndex++)
             {
                 var face = GetFace(faceIndex).ToArray();
 
-                var isVisible = IsVisibleFace(projector.ViewVector, face);
+                var isVisible = IsVisibleFace(vv, face);
 
                 order.Add((isVisible, face));
             }
-            foreach (var face in
-                order.OrderBy(x => x.Item1))
+
+            foreach (var face in order.OrderBy(x => x.isVisible))
+            { 
+                var points = face.Location.Select(projector.ProjectVertexToScreen).ToPointF();
+                projector.Graphics.DrawPolygon(PrimaryPen, points);
+            }
+            foreach (var face in order.OrderBy(x => x.isVisible))
             {
+                var points = face.Location.Select(projector.ProjectVertexToScreen).ToPointF();
                 // trying to fill it with flood fill 
                 if (TryFill)
-                    projector.FillPolygon(!face.Item1 ? Brushes.ForestGreen : Brushes.PaleGreen, face.Item2);
-                projector.Graphics.DrawPolygon(PrimaryPen,
-                    face.Item2.Select(projector.ProjectVertexToScreen).Select(x => new PointF(x.x, x.y)).ToArray());
+                    projector.FillPolygon(!face.isVisible ? Brushes.ForestGreen : Brushes.PaleGreen, face.Location);
+                if (NativeFill)
+                    projector.Graphics.FillPolygon(!face.isVisible ? Brushes.ForestGreen : Brushes.PaleGreen, points);
             }
         }
 

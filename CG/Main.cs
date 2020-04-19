@@ -71,13 +71,13 @@ namespace Playground
                 {
                     new KochSnowflake(foregroundPen),
                    // new NewtonBasins(),
-                    new Axis(),
                     new Tetrahedron(),
                     new Ellipsoid(),
                     new Cube(),
                     new FernBranch(),
                     new Hyperbola(),
-                    new TCBSpline()
+                    new TCBSpline(),
+                    new Axis()
                 });
                 BindExtensionControls();
                 InitModelAndFrameTick();

@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows;
 using MaxRev.Extensions.Matrix;
+using Point = System.Windows.Point;
 
 namespace GraphicExtensions
 {
     public static class CG
     {
+        public static PointF[] ToPointF(this IEnumerable<(float x, float y)> points)
+        {
+            return points.Select(v => new PointF(v.x, v.y)).ToArray();
+        }
+
         public static bool ContainsPoint(this IEnumerable<(float x, float y)> polygon, (float x, float y) p)
         {
             return ContainsPoint(polygon.Select(x => new Point(x.x, x.y)).ToArray(), new Point(p.x, p.y));

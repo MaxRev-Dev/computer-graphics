@@ -13,7 +13,7 @@ namespace Playground.Projections.Abstractions
         void FillPolygon(Brush brush, (float x, float y, float z)[] vertex3d);
         void ResetWorld();
         void OnFrame();
-        float[] ViewVector { get; }
+        float[] ViewVector(float[,] model);
         Graphics Graphics { get; }
         void Use(Graphics graphics, Bitmap bitmap);
     }

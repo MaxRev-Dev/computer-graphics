@@ -4,11 +4,14 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using GraphicExtensions;
+using MaxRev.Extensions.Matrix;
 
 namespace Playground.Projections.Abstractions
 {
     internal abstract class ProjectorEngine : IProjectorEngine
     {
+        private readonly float[] _cam = { 0f, 0, 0, 1 };
+
         public ProjectorEngine(Bitmap bitmap, Graphics graphics)
         {
             Bitmap = bitmap;
@@ -137,7 +140,7 @@ namespace Playground.Projections.Abstractions
 
         public virtual void OnFrame() { }
 
-        public float[] ViewVector => new[] { 0f, -1, 0 };
+        public float[] ViewVector(float[,] model) => model.FigureCenter().Take(3).ToArray();
 
         public Bitmap Bitmap { get; private set; }
         public Graphics Graphics { get; private set; }
