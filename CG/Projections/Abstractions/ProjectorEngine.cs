@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
-using GraphicExtensions;
+using GraphicsExtensions;
 using Playground.Helpers.Abstractions;
 using static System.Double;
 

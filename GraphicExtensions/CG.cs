@@ -6,7 +6,7 @@ using System.Windows;
 using MaxRev.Extensions.Matrix;
 using Point = System.Windows.Point;
 
-namespace GraphicExtensions
+namespace GraphicsExtensions
 {
     public static class CG
     {

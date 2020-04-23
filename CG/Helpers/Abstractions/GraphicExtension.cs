@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using GraphicExtensions;
+using GraphicsExtensions;
 using Playground.Helpers.Reflection;
 using Playground.Projections.Abstractions;
 

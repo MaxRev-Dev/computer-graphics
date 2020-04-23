@@ -13,7 +13,7 @@ namespace Playground.Helpers.Reflection
             return Assembly.GetExecutingAssembly().GetTypes()
                 .Where(x => !x.IsAbstract &&
                             x.GetConstructor(Type.EmptyTypes) != default &&
-                            x.GetInterfaces().Any(x => x == interf))
+                            x.GetInterfaces().Any(v => v == interf))
                 .Select(Activator.CreateInstance).Cast<T>().ToArray();
         }
     }

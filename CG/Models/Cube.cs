@@ -1,4 +1,4 @@
-﻿using GraphicExtensions;
+﻿using GraphicsExtensions;
 using Playground.Helpers.Abstractions;
 using Playground.Projections.Abstractions;
 

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
-using GraphicExtensions;
+using GraphicsExtensions;
 using Playground.Helpers.Abstractions;
 using Playground.Primitives;
 using Playground.Projections.Abstractions;

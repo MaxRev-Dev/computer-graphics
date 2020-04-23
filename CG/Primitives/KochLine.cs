@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using GraphicExtensions;
+using GraphicsExtensions;
 
 namespace Playground.Primitives
 {

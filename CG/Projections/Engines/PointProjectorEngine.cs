@@ -1,8 +1,8 @@
-﻿using GraphicExtensions;
+﻿using GraphicsExtensions;
 using MaxRev.Extensions.Matrix;
 using Playground.Projections.Abstractions;
 
-namespace Playground.Projections
+namespace Playground.Projections.Engines
 {
     internal class PointProjectorEngine : ProjectorEngine
     { 

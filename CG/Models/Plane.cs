@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using GraphicExtensions;
+using GraphicsExtensions;
 using MaxRev.Extensions.Matrix;
 using Playground.Helpers.Abstractions;
 using Playground.Projections.Abstractions;

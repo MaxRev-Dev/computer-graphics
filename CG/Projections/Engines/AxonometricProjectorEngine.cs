@@ -1,17 +1,18 @@
-﻿using MaxRev.Extensions.Binary;
+﻿using System;
+using MaxRev.Extensions.Binary;
 using MaxRev.Extensions.Matrix;
-using Playground.Projections.Abstractions;
-using System;
 using Playground.Helpers.Reflection;
+using Playground.Projections.Abstractions;
 
-namespace Playground.Projections
+namespace Playground.Projections.Engines
 {
-    enum AxonomerticProjection
+    internal enum AxonometricProjection
     {
         X, Y, Z,
         BasicIsometry,
         Custom
     }
+
     internal class AxonometricProjectorEngine : ProjectorEngine
     {
         public AxonometricProjectorEngine()
@@ -43,7 +44,7 @@ namespace Playground.Projections
         }.Cast<double, float>();
 
         [Modifiable]
-        public AxonomerticProjection Projection { get; set; }
+        public AxonometricProjection Projection { get; set; }
 
         private readonly float[,] orthoX =
         {
@@ -89,11 +90,11 @@ namespace Playground.Projections
         {
            var  matrix = Projection switch
             {
-                AxonomerticProjection.X => orthoX,
-                AxonomerticProjection.Y => orthoY,
-                AxonomerticProjection.Z => orthoZ,
-                AxonomerticProjection.BasicIsometry => basicIso,
-                AxonomerticProjection.Custom => _project(PSI, PHI),
+                AxonometricProjection.X => orthoX,
+                AxonometricProjection.Y => orthoY,
+                AxonometricProjection.Z => orthoZ,
+                AxonometricProjection.BasicIsometry => basicIso,
+                AxonometricProjection.Custom => _project(PSI, PHI),
                 _ => throw new ArgumentOutOfRangeException(),
             }; 
             var point = vertex3d.Multiply(matrix);

@@ -1,9 +1,9 @@
-﻿using GraphicExtensions;
-using MaxRev.Extensions.Matrix;
+﻿using MaxRev.Extensions.Matrix;
 using Playground.Projections.Abstractions;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using GraphicsExtensions;
 using Playground.Helpers.Abstractions;
 using Playground.Helpers.Reflection;
 

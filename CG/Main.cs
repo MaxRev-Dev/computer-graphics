@@ -1,5 +1,4 @@
-﻿using GraphicExtensions;
-using MaxRev.Extensions.Matrix;
+﻿using MaxRev.Extensions.Matrix;
 using Playground.Helpers.Abstractions;
 using Playground.Helpers.Containers;
 using Playground.Helpers.Reflection;
@@ -15,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
+using GraphicsExtensions;
 using Color = System.Drawing.Color;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 using Pen = System.Drawing.Pen;
