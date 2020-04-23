@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Playground.Helpers.Abstractions;
 using Playground.Projections.Abstractions;
 
-namespace Playground.Helpers
+namespace Playground.Helpers.Containers
 {
-    internal class ExtensionContainer : List<IGraphicExtension>
+    internal class ExtensionContainer : List<IGraphicExtension>, IActiveContainer<IGraphicExtension>
     {
-        private IGraphicExtension _active;
+        public IGraphicExtension Current { get; private set; }
 
         public void DrawAll(IProjectorEngine projector)
         {
             foreach (var extension in this)
             {
-                if (extension.Enable && extension.Global || extension == _active)
+                if (extension.Enable && extension.Global || extension == Current)
                     extension.Draw(projector);
             }
         }
@@ -36,7 +37,7 @@ namespace Playground.Helpers
         public void ActiveChanged(IGraphicExtension extension)
         {
             if (extension != default)
-                _active = extension;
+                Current = extension;
         }
     }
 }

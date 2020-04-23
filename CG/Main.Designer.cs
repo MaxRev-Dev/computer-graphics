@@ -35,6 +35,7 @@ namespace Playground
             this.label1 = new System.Windows.Forms.Label();
             this.depthLabel = new System.Windows.Forms.Label();
             this.tabs = new System.Windows.Forms.TabControl();
+            this.projectorTabs = new System.Windows.Forms.TabControl();
             ((System.ComponentModel.ISupportInitialize)(this.playground)).BeginInit();
             this.SuspendLayout();
             // 
@@ -74,20 +75,32 @@ namespace Playground
             this.tabs.Location = new System.Drawing.Point(12, 512);
             this.tabs.Name = "tabs";
             this.tabs.SelectedIndex = 0;
-            this.tabs.Size = new System.Drawing.Size(858, 138);
+            this.tabs.Size = new System.Drawing.Size(487, 138);
             this.tabs.TabIndex = 8;
             this.tabs.TabStop = false;
+            // 
+            // projectorTabs
+            // 
+            this.projectorTabs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.projectorTabs.Location = new System.Drawing.Point(505, 512);
+            this.projectorTabs.Name = "projectorTabs";
+            this.projectorTabs.SelectedIndex = 0;
+            this.projectorTabs.Size = new System.Drawing.Size(365, 138);
+            this.projectorTabs.TabIndex = 8;
+            this.projectorTabs.TabStop = false;
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(882, 662);
+            this.Controls.Add(this.projectorTabs);
             this.Controls.Add(this.tabs);
             this.Controls.Add(this.playground);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.depthLabel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Name = "Main";
             this.Text = "Tetrahedron Playground";
             this.SizeChanged += new System.EventHandler(this.Main_SizeChanged);
@@ -104,6 +117,7 @@ namespace Playground
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label depthLabel;
         private TabControl tabs;
+        private TabControl projectorTabs;
     }
 }
 

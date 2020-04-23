@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Playground.Helpers
+namespace Playground.Helpers.Reflection
 {
     public class ModifiableAttribute : Attribute
     {

@@ -1,8 +1,9 @@
 ﻿using System.Drawing;
 using GraphicExtensions;
+using Playground.Helpers.Reflection;
 using Playground.Projections.Abstractions;
 
-namespace Playground.Helpers
+namespace Playground.Helpers.Abstractions
 {
     internal abstract class GraphicExtension : IGraphicExtension
     {

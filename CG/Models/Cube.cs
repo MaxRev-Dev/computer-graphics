@@ -1,5 +1,5 @@
 ﻿using GraphicExtensions;
-using Playground.Helpers;
+using Playground.Helpers.Abstractions;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Models

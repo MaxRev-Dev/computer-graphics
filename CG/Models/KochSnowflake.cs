@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows;
 using GraphicExtensions;
-using Playground.Helpers;
+using Playground.Helpers.Abstractions;
 using Playground.Primitives;
 using Playground.Projections.Abstractions;
 
@@ -12,11 +12,6 @@ namespace Playground.Models
     {
         private List<KochLine> _lines = new List<KochLine>();
 
-        public KochSnowflake(Pen foregroundPen)
-        {
-            PrimaryPen = foregroundPen ?? PrimaryPen;
-        }
-          
         public override void Draw(IProjectorEngine projector)
         {
             if (_lines.Count == 0) Reset(projector);

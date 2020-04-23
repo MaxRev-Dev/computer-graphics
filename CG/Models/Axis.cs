@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Drawing.Text;
 using GraphicExtensions;
-using Playground.Helpers;
+using Playground.Helpers.Abstractions;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Models

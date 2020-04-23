@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using GraphicExtensions;
-using MaxRev.Extensions.Matrix;
+using Playground.Helpers.Abstractions;
+using static System.Double;
 
 namespace Playground.Projections.Abstractions
 {
     internal abstract class ProjectorEngine : IProjectorEngine
     {
-        private readonly float[] _cam = { 0f, 0, 0, 1 };
-
-        public ProjectorEngine(Bitmap bitmap, Graphics graphics)
-        {
-            Bitmap = bitmap;
-            Graphics = graphics;
-        }
+        private GraphicContext _context;
 
         public float DrawableWidth => Graphics.VisibleClipBounds.Width;
         public float DrawableHeight => Graphics.VisibleClipBounds.Height;
@@ -41,14 +35,34 @@ namespace Playground.Projections.Abstractions
         {
             var (x1, y1) = ProjectVertexToScreen(vertex3d1);
             var (x2, y2) = ProjectVertexToScreen(vertex3d2);
+            DrawLine(pen, x1, y1, x2, y2);
+        }
+
+        private void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
+        {
+            if (!(IsFinite(x1) ||
+                IsFinite(y1) ||
+                IsFinite(x2) ||
+                IsFinite(y2)))
+                return;
             Graphics.DrawLine(pen, x1, y1, x2, y2);
+        }
+
+        protected static bool IsFinite(float value)
+        {
+            return IsFinite((double)value);
+        }
+
+        protected static bool IsFinite(double value)
+        {
+            return !IsNaN(value) && !IsInfinity(value);
         }
 
         public void DrawLine(Pen pen, Vector3 vertex3d1, Vector3 vertex3d2)
         {
             var (x1, y1) = ProjectVertexToScreen(vertex3d1);
             var (x2, y2) = ProjectVertexToScreen(vertex3d2);
-            Graphics.DrawLine(pen, x1, y1, x2, y2);
+            DrawLine(pen, x1, y1, x2, y2);
         }
 
         public abstract (float x, float y) ProjectVertexToScreen(float[] vertex3d);
@@ -60,11 +74,21 @@ namespace Playground.Projections.Abstractions
             using (var pen = new Pen(brush))
             {
                 Graphics.DrawPolygon(pen, screenPoly.Select(x => new PointF(x.x, x.y)).ToArray());
-                FloodFill(Bitmap, screenPoly, ((int)center.x, (int)center.y), pen.Color);
+                ExperimentalFloodFill(Bitmap, screenPoly, ((int)center.x, (int)center.y), pen.Color);
             }
         }
 
-        private void FloodFill(Bitmap bmp, (float x, float y)[] poly, (int x, int y) start, Color fillColor)
+
+        private bool TryDropVertex((float x, float y, float z) projectedVert)
+        {
+            // out of visible screen bounds
+            return projectedVert.x < -1 ||
+                   projectedVert.x > 1 ||
+                   projectedVert.y < -1 ||
+                   projectedVert.y > 1;
+        }
+
+        private void ExperimentalFloodFill(Bitmap bmp, (float x, float y)[] poly, (int x, int y) start, Color fillColor)
         {
             if (!poly.ContainsPoint(start))
                 return;
@@ -142,13 +166,18 @@ namespace Playground.Projections.Abstractions
 
         public float[] ViewVector(float[,] model) => model.FigureCenter().Take(3).ToArray();
 
-        public Bitmap Bitmap { get; private set; }
-        public Graphics Graphics { get; private set; }
+        public Bitmap Bitmap => _context.Bitmap;
+        public Graphics Graphics => _context.Graphics;
+        public GraphicContext Context => _context;
 
-        public void Use(Graphics graphics, Bitmap bitmap)
+        public IProjectorEngine Use(GraphicContext context)
         {
-            Graphics = graphics;
-            Bitmap = bitmap;
+            _context = context;
+            if (!IsReady)
+                ResetWorld();
+            return this;
         }
+
+        public virtual bool IsReady { get; protected set; } = true;
     }
 }

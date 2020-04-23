@@ -1,17 +1,11 @@
-﻿using System.Drawing;
-using GraphicExtensions;
+﻿using GraphicExtensions;
 using MaxRev.Extensions.Matrix;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Projections
 {
-    internal class PlanarProjectorEngine : ProjectorEngine
-    {
-        public PlanarProjectorEngine(Bitmap bitmap, Graphics graphics) : base(bitmap, graphics)
-        {
-        }
-
-
+    internal class PointProjectorEngine : ProjectorEngine
+    { 
         // projection
         private float[,] worldToCamera;
         private float[,] projMatrix;
@@ -25,13 +19,15 @@ namespace Playground.Projections
             // mainFigure = CG.ApplyTransform(mainFigure, CG.TranslateZ(-10));
             worldToCamera = MatrixExtensions.IdentityF(4);
             angleOfView = 90;
-            near = 0.1f;
-            far = 100;
+            near = 1f;
+            far = 1000;
             projMatrix = MatrixExtensions.IdentityF(4);
             worldToCamera[3, 1] = -10;
             worldToCamera[3, 2] = -20;
             // CG.setProjectionMatrix(projMatrix, angleOfView, near, far);
         }
+
+        public override bool IsReady => projMatrix != default;
 
         public override void OnFrame()
         {

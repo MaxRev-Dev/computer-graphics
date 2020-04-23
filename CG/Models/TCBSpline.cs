@@ -1,5 +1,4 @@
 ﻿using System;
-using Playground.Helpers;
 using Playground.Projections.Abstractions;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,6 +6,8 @@ using System.Drawing.Text;
 using System.Linq;
 using System.Numerics;
 using MaxRev.Extensions.Matrix;
+using Playground.Helpers.Abstractions;
+using Playground.Helpers.Reflection;
 
 namespace Playground.Models
 {

@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using Playground.Projections.Abstractions;
 
-namespace Playground.Helpers
+namespace Playground.Helpers.Abstractions
 {
     internal interface IGraphicExtension
     {

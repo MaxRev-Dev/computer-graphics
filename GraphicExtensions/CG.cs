@@ -101,29 +101,51 @@ namespace GraphicExtensions
 
         public static float[] MultiplyNorm(this float[] a, float[,] matrix)
         {
-            return Multiply(a, matrix).Normalize();
+            return a.Multiply(matrix).Normalize();
         }
 
-        public static float[] Multiply(this float[] a, float[,] matrix)
+        #region GLU
+
+        public static void gluPerspective(
+             float angOfView,
+             float imageAspectRatio,
+             float n,
+             out float b, out float t, out float l, out float r)
         {
-            var res = new float[a.Length];
-            for (int u = 0; u < a.Length; u++)
-            {
-                var i = 0;
-                res[u] = a.Aggregate(0f, (acc, x) => acc + x * matrix[u, i++]);
-            }
-            return res;
+            var scale = (float)(Math.Tan(angOfView * 0.5 * Math.PI / 180) * n);
+            r = imageAspectRatio * scale;
+            l = -r;
+            t = scale;
+            b = -t;
         }
 
-        public static float[] Add(float[] a, float[] b)
+        // set the OpenGL perspective projection matrix
+        public static void glFrustum(
+            float b, float t, float l, float r, float n, float f, float[,] M)
         {
-            var ret = new float[a.Length];
-            for (int i = 0; i < a.Length; i++)
-            {
-                ret[i] = a[i] + b[i];
-            }
-            return ret;
+            // OpenGL perspective projection matrix
+            M[0, 0] = 2 * n / (r - l);
+            M[0, 1] = 0;
+            M[0, 2] = 0;
+            M[0, 3] = 0;
+
+            M[1, 0] = 0;
+            M[1, 1] = 2 * n / (t - b);
+            M[1, 2] = 0;
+            M[1, 3] = 0;
+
+            M[2, 0] = (r + l) / (r - l);
+            M[2, 1] = (t + b) / (t - b);
+            M[2, 2] = -(f + n) / (f - n);
+            M[2, 3] = -1;
+
+            M[3, 0] = 0;
+            M[3, 1] = 0;
+            M[3, 2] = -2 * f * n / (f - n);
+            M[3, 3] = 0;
         }
+
+        #endregion
 
         public static void setProjectionMatrix(float[,] projMatrix, float angleOfView, float near, float far)
         {
@@ -175,25 +197,6 @@ namespace GraphicExtensions
         public static (float x, float y, float z) point(this float[,] model, int index)
         {
             return (model[index, 0], model[index, 1], model[index, 2]);
-        }
-
-        public static float[] Normalize(this float[] a)
-        {
-            if (a.Any(x => Math.Abs(x) > 1))
-            {
-                var b = new float[a.Length];
-                var m = (float)Math.Sqrt(a.Aggregate(0f, (acc, x) => acc + x * x));
-                for (int i = 0; i < a.Length; i++)
-                    b[i] = a[i] / m;
-                return b;
-            }
-
-            return a;
-        }
-
-        public static float Dot(this float[] v1, float[] v2)
-        {
-            return v1.Multiply(v2);
         }
 
         public static float[] Cross(this float[] v1, float[] v2)
@@ -284,7 +287,7 @@ namespace GraphicExtensions
             var verts = model.GetLength(0);
             return Enumerable.Range(0, verts)
                 .Select(i => model.GetRow(i))
-                .Aggregate(new float[4], (x, acc) => Add(acc, x))
+                .Aggregate(new float[4], (x, acc) => acc.Add(x))
                 .Select(x => x / verts).ToArray();
         }
         public static float[] Polygon2DCenter(this float[][] polygon)
@@ -292,7 +295,7 @@ namespace GraphicExtensions
             var verts = polygon.Length;
             return Enumerable.Range(0, verts)
                 .Select(i => polygon[i])
-                .Aggregate(new float[2], (x, acc) => Add(acc, x))
+                .Aggregate(new float[2], (x, acc) => acc.Add(x))
                 .Select(x => x / verts).ToArray();
         }
         public static (float x, float y, float z) Polygon3DCenter(this (float x, float y, float z)[] polygon)
@@ -300,7 +303,7 @@ namespace GraphicExtensions
             var verts = polygon.Length;
             return Enumerable.Range(0, verts)
                 .Select(i => polygon[i])
-                .Aggregate(new float[3], (x, acc) => Add(acc.ToArray(), x))
+                .Aggregate(new float[3], (x, acc) => acc.ToArray().Add(x))
                 .Select(x => x / verts).ToArray().ToPoint3D();
         }
     }

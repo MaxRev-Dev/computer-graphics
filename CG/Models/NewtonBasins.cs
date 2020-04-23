@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
-using Playground.Helpers;
+using Playground.Helpers.Abstractions;
+using Playground.Helpers.Reflection;
 using Playground.Projections.Abstractions;
 
 namespace Playground.Models
@@ -13,14 +14,16 @@ namespace Playground.Models
             public double y;
         }
         [Modifiable(Max = 100, Min = 1, Scaling = 1)]
-        public int Iterations { get; set; } = 20;
+        public int Iterations { get; set; } = 25;
         public double Min { get; set; } = 1e-8;
         public double Max { get; set; } = 1e+8;
 
         public void FillNewtonBasins(Graphics g, int mx1, int my1)
         {
-            var mx = mx1 / 2;
-            var my = my1 / 2;
+            var mx = mx1 / 4;
+            var my = my1 / 4;
+            var offsetX = mx1 / 4;
+            var offsetY = my1 / 4;
             using (var pen = new Pen(Color.White))
             {
                 for (int y = -my; y < my; y++)
@@ -47,7 +50,7 @@ namespace Playground.Models
                         }
 
                         pen.Color = Color.FromArgb(255, (n * 12) % 255, 0, (n * 12) % 255);
-                        g.DrawRectangle(pen, mx + x, my + y, 1, 1);
+                        g.DrawRectangle(pen, mx + x + offsetX, my + y + offsetY, 1, 1);
                     }
                 }
             }

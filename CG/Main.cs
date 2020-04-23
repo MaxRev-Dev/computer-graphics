@@ -1,7 +1,11 @@
 ﻿using GraphicExtensions;
 using MaxRev.Extensions.Matrix;
-using Playground.Helpers;
+using Playground.Helpers.Abstractions;
+using Playground.Helpers.Containers;
+using Playground.Helpers.Reflection;
 using Playground.Models;
+using Playground.Projections.Abstractions;
+using Playground.Projections.Engines;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,8 +15,6 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
-using Playground.Projections;
-using Playground.Projections.Abstractions;
 using Color = System.Drawing.Color;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 using Pen = System.Drawing.Pen;
@@ -23,11 +25,12 @@ namespace Playground
     {
         #region Fields
 
-        // graphics
-        private Graphics _graphics;
+        // graphics 
         private Bitmap _bitmap;
+        private GraphicContext _context;
 
         // graphic models container
+        private readonly ProjectorContainer _projectors = new ProjectorContainer();
         private readonly ExtensionContainer _extensions = new ExtensionContainer();
 
         // modes
@@ -41,95 +44,99 @@ namespace Playground
         // intermediate rotation angle
         private float _angle;
         private float minRotate = 0.01745329F; // Math.PI / 180
+        private readonly float[,] _defaultTrs = MatrixExtensions.IdentityF(4);
 
         private Pen foregroundPen;
-        private Color _background;
         private Color _foreground;
 
         // debug test
         private readonly StringBuilder _testOutputBuilder;
         private readonly StringWriter _testOutputWriter;
-
-        private readonly IProjectorEngine _projector;
         #endregion
 
-        #region Properties
-
-        #endregion
 
         public Main()
         {
             InitializeComponent();
             CreatePlayground();
 
-            _projector = new PlanarProjectorEngine(_bitmap, _graphics);
-            //_projector = new DimetricProjectorEngine(_graphics);
-
             Load += (s, e) =>
             {
-                _extensions.AddRange(new IGraphicExtension[]
-                {
-                    new KochSnowflake(foregroundPen),
-                   // new NewtonBasins(),
-                    new Tetrahedron(),
-                    new Ellipsoid(),
-                    new Cube(),
-                    new FernBranch(),
-                    new Hyperbola(),
-                    new TCBSpline(),
-                    new Axis()
-                });
+                _context = new GraphicContext();
+                _context.Reset(_bitmap);
+                _projectors.AddRange(AssemblyExtensions.FindAllImplementationsAndActivate<IProjectorEngine>());
+
+                _projectors.InitializeAll(_context);
+
+                _extensions.AddRange(AssemblyExtensions.FindAllImplementationsAndActivate<IGraphicExtension>());
+
+                _projectors.Use<PerspectiveProjectorEngine>();
                 BindExtensionControls();
                 InitModelAndFrameTick();
             };
-
 
             playground.MouseWheel += CG_MouseWheel;
             playground.KeyPress += Main_KeyPress;
             playground.Paint += (s, e) => e.Graphics.DrawImage(_bitmap, 0, 0);
             _testOutputBuilder = new StringBuilder();
             _testOutputWriter = new StringWriter(_testOutputBuilder);
-
         }
+
+        #region Init bindings
 
         private void BindExtensionControls()
         {
+            tabs.SelectedIndexChanged += (s, e) => SubscribeTabs(s, _extensions);
+            projectorTabs.SelectedIndexChanged += (s, e) => SubscribeTabs(s, _projectors);
             var binder = new AttributeBinder();
-            tabs.SelectedIndexChanged += (s, e) =>
-            {
-                var tab = tabs.SelectedTab;
-                var name = tab.Text;
-                _extensions.ActiveChanged(_extensions.FirstOrDefault(x => x.GetType().Name == name));
-            };
-            foreach (var extension in _extensions)
-            {
-                var name = extension.GetType().Name;
-                var page = new TabPage { Text = name };
-                tabs.TabPages.Add(page);
-                var floater = new FlowLayoutPanel { Dock = DockStyle.Fill };
-                page.Controls.Add(floater);
-                foreach (var prop in extension.GetType().GetProperties())
-                {
-                    binder.BindTo(floater, extension, prop);
-                }
-            }
+            ExtendTo(tabs, _extensions, binder.BindTo);
+            ExtendTo(projectorTabs, _projectors, binder.BindTo);
 
             binder.OnRedraw += (e, reset) =>
             {
                 if (reset)
-                    e.Reset(_projector);
+                    e.Reset(_projectors.Current);
                 Draw();
             };
 
-
+            // apply on visible tabs
+            projectorTabs.SelectedIndex = tabs.SelectedIndex = 1;
         }
+
+        private void ExtendTo<T>(TabControl control, IActiveContainer<T> extensions, Action<FlowLayoutPanel, T, PropertyInfo> PropertyCallBack)
+        {
+            foreach (var extension in extensions)
+            {
+                var name = extension.GetType().Name;
+                var page = new TabPage { Text = name };
+                control.TabPages.Add(page);
+                var floater = new FlowLayoutPanel { Dock = DockStyle.Fill };
+                floater.VerticalScroll.Enabled = true;
+                floater.AutoScroll = true;
+                floater.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+                floater.AutoSize = true;
+                page.Controls.Add(floater);
+                foreach (var prop in extension.GetType().GetProperties())
+                {
+                    PropertyCallBack(floater, extension, prop);
+                }
+            }
+        }
+
+        private void SubscribeTabs<T>(object sender, IActiveContainer<T> extensions)
+        {
+            var tab = ((TabControl)sender).SelectedTab;
+            var name = tab.Text;
+            extensions.ActiveChanged(extensions.FirstOrDefault(x => x.GetType().Name == name));
+        }
+
+        #endregion
 
         #region Reset
 
         private void InitModelAndFrameTick()
         {
             _foreground = Color.Blue;
-            _background = Color.DarkRed;
             foregroundPen = new Pen(_foreground, 1);
             ResetAll();
             var timer = new Timer
@@ -143,34 +150,40 @@ namespace Playground
         private void ResetAll()
         {
             ResetModel();
-            _projector.ResetWorld();
+            _projectors.Current.ResetWorld();
         }
-
 
         private void ResetModel()
         {
-            _extensions.InitializeAll(_projector);
+            _extensions.InitializeAll(_projectors.Current);
         }
         #endregion
 
+        #region Core graphics
+
         private void Transform(float[,] trs)
         {
-            _extensions.ApplyTransformation(trs);
+            if (!_moveModel)
+                _extensions.ApplyTransformation(trs);
+            else
+            {
+                var c = _projectors.Current as PerspectiveProjectorEngine;
+                c?.TransformCamera(trs);
+            }
         }
 
         private void CreatePlayground()
         {
             _bitmap?.Dispose();
-            _graphics?.Dispose();
+            _context?.Graphics?.Dispose();
             if (!ValidateGraphics()) return;
             _bitmap = new Bitmap(playground.Bounds.Width, playground.Bounds.Height);
-            _graphics = Graphics.FromImage(_bitmap);
-            _projector?.Use(_graphics, _bitmap);
+            _context?.Reset(_bitmap);
         }
 
         private void OnFrame(object sender, EventArgs e)
         {
-            _projector.OnFrame();
+            _projectors.Current.OnFrame();
             if (_autoRotate)
             {
                 if (_angle >= Math.PI * 2)
@@ -182,60 +195,34 @@ namespace Playground
             if (CheckKeys() || _autoRotate)
             {
                 Draw();
-
             }
 
             //mainFigure.PrintThrough(_testOutputWriter);
             label1.Text = _testOutputBuilder.ToString();
             _testOutputBuilder.Clear();
         }
-
-        #region GLU
-
-        void gluPerspective(
-            float angOfView,
-            float imageAspectRatio,
-            float n,
-            out float b, out float t, out float l, out float r)
+        private void Draw(IGraphicExtension extension = default)
         {
-            var scale = (float)(Math.Tan(angOfView * 0.5 * Math.PI / 180) * n);
-            r = imageAspectRatio * scale;
-            l = -r;
-            t = scale;
-            b = -t;
+            if (!ValidateGraphics()) return;
+            _context.Graphics.Clear(playground.BackColor);
+            if (extension == default)
+                _extensions.DrawAll(_projectors.Current);
+            else
+                extension.Draw(_projectors.Current);
+
+            playground.Invalidate();
         }
 
-        // set the OpenGL perspective projection matrix
-        void glFrustum(
-            float b, float t, float l, float r, float n, float f, float[,] M)
+        private bool ValidateGraphics()
         {
-            // OpenGL perspective projection matrix
-            M[0, 0] = 2 * n / (r - l);
-            M[0, 1] = 0;
-            M[0, 2] = 0;
-            M[0, 3] = 0;
-
-            M[1, 0] = 0;
-            M[1, 1] = 2 * n / (t - b);
-            M[1, 2] = 0;
-            M[1, 3] = 0;
-
-            M[2, 0] = (r + l) / (r - l);
-            M[2, 1] = (t + b) / (t - b);
-            M[2, 2] = -(f + n) / (f - n);
-            M[2, 3] = -1;
-
-            M[3, 0] = 0;
-            M[3, 1] = 0;
-            M[3, 2] = -2 * f * n / (f - n);
-            M[3, 3] = 0;
+            return !(playground.Bounds.IsEmpty ||
+                     playground.Bounds.Height == 0 ||
+                     playground.Bounds.Width == 0);
         }
 
         #endregion
 
         #region Keys & wheel
-
-        private readonly float[,] _defaultTrs = MatrixExtensions.IdentityF(4);
 
         private bool CheckKeys()
         {
@@ -251,7 +238,7 @@ namespace Playground
             if (IsPressed(Key.R))
             {
                 ResetModel();
-                _projector.ResetWorld();
+                _projectors.Current.ResetWorld();
             }
 
             if (IsPressed(Key.OemCloseBrackets))
@@ -330,7 +317,7 @@ namespace Playground
                 case 'a':
                     _autoRotate = !_autoRotate;
                     break;
-                case 'c':
+                case 'o':
                     _moveModel = !_moveModel;
                     break;
             }
@@ -341,68 +328,14 @@ namespace Playground
             CreatePlayground();
             playground.Invalidate();
         }
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            var modCtrl = Keyboard.Modifiers.HasFlag(System.Windows.Input.ModifierKeys.Control);
-            var modAlt = Keyboard.Modifiers.HasFlag(System.Windows.Input.ModifierKeys.Alt);
-            if (!msg.HWnd.Equals(this.Handle) &&
-                (keyData == Keys.Left || keyData == Keys.Right ||
-                 keyData == Keys.Up || keyData == Keys.Down) && !(modAlt || modCtrl))
-                return true;
-            return base.ProcessCmdKey(ref msg, keyData);
-        }
         #endregion
 
-
-        private void Draw(IGraphicExtension extension = default)
-        {
-            if (!ValidateGraphics()) return;
-            _graphics.Clear(playground.BackColor);
-            if (extension == default)
-                _extensions.DrawAll(_projector);
-            else
-            {
-                extension.Draw(_projector);
-            }
-            playground.Invalidate();
-        }
-
-        private bool ValidateGraphics()
-        {
-            return !(playground.Bounds.IsEmpty ||
-                     playground.Bounds.Height == 0 ||
-                     playground.Bounds.Width == 0);
-        }
-
-        private bool TryDropVertex((float x, float y, float z) projectedVert)
-        {
-            // out of visible screen bounds
-            return projectedVert.x < -1 ||
-                   projectedVert.x > 1 ||
-                   projectedVert.y < -1 ||
-                   projectedVert.y > 1;
-        }
-        /* private void HistoryPath(float[,] vertices)
-         {
-             Func<float[], (float, float)> v = f => PointToScreen(f[0], f[1]);
-
-             var figureCenter = CG.FigureCenter(vertices);
-             _lastpoints.Enqueue(figureCenter);
-             if (_lastpoints.Count > 500)
-                 _lastpoints.Dequeue();
-             foreach (var vx in _lastpoints)
-             {
-                 var vertCamera = vx.Multiply(worldToCamera);
-                 var projectedVert = vertCamera.Multiply(projMatrix).ToPoint3D();
-                 if (TryDropVertex(projectedVert)) continue;
-                 var (xr, yr) = v(projectedVert.ToArray());
-                 _graphics.DrawEllipse(Pens.Blue, xr, yr, 2, 2);
-             }
-         }*/
-
-
+        #region Helpers
+         
         private float eps(float x) => (float)(x > 0 ? Math.PI / 300 : -Math.PI / 300);
 
         private float Eps(float x) => (float)(x * Math.PI / 300);
+
+        #endregion
     }
 }

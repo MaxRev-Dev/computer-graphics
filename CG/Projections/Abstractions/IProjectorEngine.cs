@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Numerics;
+using Playground.Helpers.Abstractions;
 
 namespace Playground.Projections.Abstractions
 {
@@ -15,6 +16,7 @@ namespace Playground.Projections.Abstractions
         void OnFrame();
         float[] ViewVector(float[,] model);
         Graphics Graphics { get; }
-        void Use(Graphics graphics, Bitmap bitmap);
+        GraphicContext Context { get; }
+        IProjectorEngine Use(GraphicContext context);
     }
 }
