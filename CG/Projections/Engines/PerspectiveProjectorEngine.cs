@@ -47,9 +47,9 @@ namespace Playground.Projections.Engines
 
         public void TransformCamera(float[,] trs)
         {
-            var cameraToWord = worldToCamera.Cast<float, double>().Inverse();
-            var res = cameraToWord.Cast<double, float>().Multiply(trs);
-            worldToCamera = res.Cast<float, double>().Inverse().Cast<double, float>();
+            var cameraToWord = worldToCamera.Inverse();
+            var res = cameraToWord.Multiply(trs);
+            worldToCamera = res.Inverse();
 
         }
     }

@@ -61,8 +61,8 @@ namespace Playground.Models
         {
             var graphics = projector.Graphics;
             FillNewtonBasins(graphics,
-                (int)graphics.VisibleClipBounds.Width,
-                (int)graphics.VisibleClipBounds.Height);
+                (int)projector.Context.DrawableWidth,
+                (int)projector.Context.DrawableHeight);
         }
 
     }

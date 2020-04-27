@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MaxRev.BinaryRelations" Version="1.4.8" />
+    <PackageReference Include="MaxRev.BinaryRelations" Version="1.5.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -64,8 +64,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BinaryRelations, Version=1.4.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaxRev.BinaryRelations.1.4.8\lib\netstandard2.0\BinaryRelations.dll</HintPath>
+    <Reference Include="BinaryRelations, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaxRev.BinaryRelations.1.5.0\lib\netstandard2.0\BinaryRelations.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
@@ -90,6 +90,7 @@
     <Compile Include="Helpers\Reflection\AttributeBinder.cs" />
     <Compile Include="Helpers\Abstractions\GraphicContext.cs" />
     <Compile Include="Helpers\Abstractions\IActiveContainer.cs" />
+    <Compile Include="Helpers\Reflection\Extensions.cs" />
     <Compile Include="Helpers\Reflection\ModifiableAttribute.cs" />
     <Compile Include="Helpers\Containers\ProjectorContainer.cs" />
     <Compile Include="Models\Hyperbola.cs" />

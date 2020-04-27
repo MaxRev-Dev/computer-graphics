@@ -17,5 +17,9 @@ namespace Playground.Helpers.Abstractions
         public Graphics Graphics => _graphics ??= Graphics.FromImage(Bitmap);
 
         public Bitmap Bitmap { get; private set; }
+
+        public float DrawableWidth => Graphics?.VisibleClipBounds.Width ?? 0;
+
+        public float DrawableHeight => Graphics?.VisibleClipBounds.Height ?? 0;
     }
 }

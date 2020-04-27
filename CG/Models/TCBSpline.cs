@@ -108,14 +108,14 @@ namespace Playground.Models
             int randomPoints = 10;
             // randomize on each redraw
             KeyPoints.Clear();
-            var b = projector.Graphics.VisibleClipBounds;
+            var b = projector.Context;
 
             var scaling = .015f;
             var offset = new Vector3(-10, -6, 0);
             int prewX = 100, prewY = 200;
-            int stepX = (int)((b.Width - prewX) / (randomPoints + 2));
-            int stepY = (int)((b.Height - prewY) / (randomPoints + 2));
-            int stepZ = (int)(((b.Height + b.Width) / 2) / (randomPoints + 2));
+            int stepX = (int)((b.DrawableWidth - prewX) / (randomPoints + 2));
+            int stepY = (int)((b.DrawableHeight - prewY) / (randomPoints + 2));
+            int stepZ = (int)(((b.DrawableHeight + b.DrawableWidth) / 2) / (randomPoints + 2));
 
             for (int i = 0, rit = 1; i < randomPoints; i++, rit++)
             {

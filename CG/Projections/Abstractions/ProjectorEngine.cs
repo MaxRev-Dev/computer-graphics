@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using GraphicsExtensions;
+using Playground.Helpers.Abstractions;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
-using GraphicsExtensions;
-using Playground.Helpers.Abstractions;
 using static System.Double;
 
 namespace Playground.Projections.Abstractions
@@ -12,8 +12,8 @@ namespace Playground.Projections.Abstractions
     {
         private GraphicContext _context;
 
-        public float DrawableWidth => Graphics.VisibleClipBounds.Width;
-        public float DrawableHeight => Graphics.VisibleClipBounds.Height;
+        protected float DrawableWidth => _context.DrawableWidth;
+        protected float DrawableHeight => _context.DrawableHeight;
 
         protected virtual (float x, float y) PointToScreen(float[] point2D)
         {

@@ -86,6 +86,8 @@ namespace Playground
 
         private void BindExtensionControls()
         {
+            SubscribeHandleByArrows(tabs);
+            SubscribeHandleByArrows(projectorTabs);
             tabs.SelectedIndexChanged += (s, e) => SubscribeTabs(s, _extensions);
             projectorTabs.SelectedIndexChanged += (s, e) => SubscribeTabs(s, _projectors);
             var binder = new AttributeBinder();
@@ -124,10 +126,21 @@ namespace Playground
         }
 
         private void SubscribeTabs<T>(object sender, IActiveContainer<T> extensions)
-        {
+        { 
             var tab = ((TabControl)sender).SelectedTab;
             var name = tab.Text;
             extensions.ActiveChanged(extensions.FirstOrDefault(x => x.GetType().Name == name));
+        }
+
+        private void SubscribeHandleByArrows(TabControl sender)
+        {
+            sender.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Left || e.KeyCode == Keys.Right)
+                {
+                    e.Handled = true;
+                }
+            };
         }
 
         #endregion
@@ -331,7 +344,7 @@ namespace Playground
         #endregion
 
         #region Helpers
-         
+
         private float eps(float x) => (float)(x > 0 ? Math.PI / 300 : -Math.PI / 300);
 
         private float Eps(float x) => (float)(x * Math.PI / 300);

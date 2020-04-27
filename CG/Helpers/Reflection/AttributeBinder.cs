@@ -56,21 +56,21 @@ namespace Playground.Helpers.Reflection
                 prop.PropertyType == typeof(int))
             {
                 var flow = new FlowLayoutPanel();
-                flow.VerticalScroll.Enabled = true;
-                var val = Convert.ChangeType(prop.GetValue(sender), typeof(float));
+                flow.VerticalScroll.Enabled = true; 
                 var c = new TrackBar
                 {
                     Maximum = (int)(ma.Max),
                     Minimum = (int)(ma.Min),
-                    Value = (int)(Math.Min((ma.Min + ma.Max) / 2, (float)val) * (1f / ma.Scaling)),
+                    Value = ma.GetIntegerForControl((float)Convert.ChangeType(prop.GetValue(sender), typeof(float))),
                     TabStop = false,
                     CausesValidation = false
                 };
-                var desr = new Label { Text = $@"{prop.Name}:{c.Value * ma.Scaling}" };
+                var desr = new Label { Text = $@"{prop.Name}:{ma.GetSimpleValue(c.Value)}" };
                 c.Scroll += (s, e) =>
                 {
-                    prop.SetValue(sender, Convert.ChangeType(c.Value * ma.Scaling, prop.PropertyType));
-                    desr.Text = $@"{prop.Name}:{c.Value * ma.Scaling}";
+                    var t = ma.GetSimpleValue(c.Value);
+                    prop.SetValue(sender, Convert.ChangeType(t, prop.PropertyType));
+                    desr.Text = $@"{prop.Name}:{t}";
                     OnChangeCallback(sender);
                 };
                 flow.FlowDirection = FlowDirection.BottomUp;

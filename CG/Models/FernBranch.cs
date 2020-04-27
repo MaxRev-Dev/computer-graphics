@@ -16,18 +16,18 @@ namespace Playground.Models
         private float _alfa;
         private float _beta;
 
-        [Modifiable(Scaling = 1f, Min = 0.01f, Max = 180)]
+        [Modifiable(Scaling = 1f, Min = 0.01f, Step = .5f, Max = 180)]
         public float BetaAngle
         {
-            get => (float) (_beta / Math.PI * 180);
-            set => _beta = (float) (value * Math.PI / 180);
-        } 
+            get => _beta.ToDeg();
+            set => _beta = value.FromDeg();
+        }
 
-        [Modifiable(Scaling = 1f, Min = 0.01f, Max = 180)]
+        [Modifiable(Scaling = 1f, Min = 0.01f, Step = .5f, Max = 180)]
         public float AlfaAngle
         {
-            get => (float)(_alfa / Math.PI * 180);
-            set => _alfa = (float)(value * Math.PI / 180);
+            get => _alfa.ToDeg();
+            set => _alfa = value.FromDeg();
         }
 
         [Modifiable(Scaling = .1f, Min = 0.01f, Max = 10)]
@@ -68,11 +68,11 @@ namespace Playground.Models
 
         public override void Draw(IProjectorEngine projector)
         {
-            var b = projector.Graphics.VisibleClipBounds;
+            var b = projector.Context;
             Generate(projector,
-                b.Width / 2,
-                b.Height - 200,  // center and a bit up
-                b.Width / 2,
+                b.DrawableWidth / 2,
+                b.DrawableHeight - 200,  // center and a bit up
+                b.DrawableWidth / 2,
                 10, 10);
         }
     }
